@@ -1,0 +1,19 @@
+import { createFileRoute } from "@tanstack/react-router";
+import DocumentUploadPage from "@/pages/DocumentUpload";
+
+const description =
+  "Drag and drop pleadings, exhibits, hearing recordings and site footage for OCR, entity extraction and timeline detection.";
+
+export const Route = createFileRoute("/documents/")({
+  head: () => ({
+    meta: [
+      { title: "Document Upload — Lexora" },
+      { name: "description", content: description },
+      { property: "og:title", content: "Document Upload — Lexora" },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: DocumentUploadPage,
+});
