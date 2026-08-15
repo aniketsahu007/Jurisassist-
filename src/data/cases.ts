@@ -1,20 +1,8 @@
 export type CaseStatus =
-  | "Active"
-  | "Under Trial"
-  | "Reserved for Judgment"
-  | "Disposed"
-  | "Stayed"
-  | "Appeal Filed";
+  "Active" | "Under Trial" | "Reserved for Judgment" | "Disposed" | "Stayed" | "Appeal Filed";
 
 export type CaseType =
-  | "Criminal"
-  | "Civil"
-  | "Corporate"
-  | "Family"
-  | "Constitutional"
-  | "Tax"
-  | "Labour"
-  | "Property";
+  "Criminal" | "Civil" | "Corporate" | "Family" | "Constitutional" | "Tax" | "Labour" | "Property";
 
 export type CasePriority = "Critical" | "High" | "Medium" | "Low";
 

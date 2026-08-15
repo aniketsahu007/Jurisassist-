@@ -173,21 +173,24 @@ export const caseReport: CaseReport = {
   issues: [
     {
       id: "i-1",
-      issue: "Whether the forensic image of the seized laptop is admissible without a compliant §65B(4) certificate.",
+      issue:
+        "Whether the forensic image of the seized laptop is admissible without a compliant §65B(4) certificate.",
       position:
         "The certificate is signed by the Investigating Officer eleven months after seizure and does not identify the device in lawful control at the time of copying.",
       strength: "Strong",
     },
     {
       id: "i-2",
-      issue: "Whether the break in the chain of custody between 18 and 22 August 2023 vitiates the recovery.",
+      issue:
+        "Whether the break in the chain of custody between 18 and 22 August 2023 vitiates the recovery.",
       position:
         "The case diary is silent for four days and the exhibit count differs between the panchanama and the FSL memo.",
       strength: "Strong",
     },
     {
       id: "i-3",
-      issue: "Whether authorship of the impugned instruments has been proved against the appellant.",
+      issue:
+        "Whether authorship of the impugned instruments has been proved against the appellant.",
       position:
         "No handwriting comparison under §45 was sought and no signature was admitted or proved.",
       strength: "Arguable",

@@ -15,7 +15,7 @@ def get_supabase() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 
-def create_signed_upload_url(doc_id: str, filename: str) -> str:
+def create_signed_upload_url(doc_id: str, filename: str) -> tuple[str, str]:
     """Generate a signed URL that allows the frontend to upload a file directly to Supabase Storage."""
     client = get_supabase()
     # Path in the bucket: <doc_id>/<original_filename>

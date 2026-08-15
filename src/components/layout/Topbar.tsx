@@ -1,23 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Sun, Search, ChevronDown, LogOut, User, Settings } from "lucide-react";
+import { Bell, Moon, Sun, Search, UserCircle } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "@/lib/theme";
 import { useNotifications } from "@/hooks/useDashboard";
 import { cn } from "@/lib/utils";
@@ -87,40 +74,13 @@ export function Topbar() {
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-9 gap-2 pr-2 pl-1.5">
-              <Avatar className="h-6 w-6">
-                <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
-                  KM
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm font-medium md:inline">Kavita Menon</span>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <p className="text-sm font-medium">Sr. Adv. Kavita Menon</p>
-              <p className="text-xs font-normal text-muted-foreground">Menon & Partners LLP</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/profile">
-                <User className="mr-2 h-4 w-4" /> Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/settings">
-                <Settings className="mr-2 h-4 w-4" /> Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut className="mr-2 h-4 w-4" /> Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="ml-2 flex items-center border-l pl-2">
+          <Button variant="ghost" size="icon" asChild aria-label="Profile">
+            <Link to="/profile">
+              <UserCircle className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
       </div>
     </header>
   );

@@ -4,13 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const icons = [Briefcase, UploadCloud, Gavel, Sparkles];
 
-export function StatCards({
-  metrics,
-  loading,
-}: {
-  metrics: DashboardMetric[];
-  loading: boolean;
-}) {
+export function StatCards({ metrics, loading }: { metrics: DashboardMetric[]; loading: boolean }) {
   if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

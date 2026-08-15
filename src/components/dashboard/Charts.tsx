@@ -58,13 +58,7 @@ function ChartFrame({
   );
 }
 
-export function CasesByStatusChart({
-  data,
-  loading,
-}: {
-  data: MetricPoint[];
-  loading: boolean;
-}) {
+export function CasesByStatusChart({ data, loading }: { data: MetricPoint[]; loading: boolean }) {
   const mounted = useMounted();
   const palette = [
     "var(--color-chart-1)",

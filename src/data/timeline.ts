@@ -1,10 +1,5 @@
 export type TimelineStage =
-  | "Incident"
-  | "FIR Registered"
-  | "Arrest"
-  | "Chargesheet"
-  | "Hearing"
-  | "Judgment";
+  "Incident" | "FIR Registered" | "Arrest" | "Chargesheet" | "Hearing" | "Judgment";
 
 export type TimelineStatus = "completed" | "current" | "upcoming" | "adjourned";
 
@@ -83,7 +78,11 @@ export const caseTimeline: TimelineEvent[] = [
     details: {
       location: "Court of Sessions for Greater Bombay",
       officer: "Investigating Officer, PS Bandra",
-      documents: ["Chargesheet FIR 214/2023", "FSL report dated 06 Oct 2023", "Annexure C — chain of custody"],
+      documents: [
+        "Chargesheet FIR 214/2023",
+        "FSL report dated 06 Oct 2023",
+        "Annexure C — chain of custody",
+      ],
       notes:
         "Cognizance taken on 22 September 2023; matter committed to the Sessions Court on 11 October 2023.",
     },

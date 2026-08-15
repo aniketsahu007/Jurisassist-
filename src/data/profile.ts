@@ -112,10 +112,34 @@ export const billing = {
   amount: "₹48,000 / month",
   paymentMethod: "HDFC Business Card ending 4417",
   invoices: [
-    { id: "INV-2026-08", period: "Aug 2026", amount: "₹48,000", status: "Due", issued: "01 Aug 2026" },
-    { id: "INV-2026-07", period: "Jul 2026", amount: "₹48,000", status: "Paid", issued: "01 Jul 2026" },
-    { id: "INV-2026-06", period: "Jun 2026", amount: "₹44,000", status: "Paid", issued: "01 Jun 2026" },
-    { id: "INV-2026-05", period: "May 2026", amount: "₹44,000", status: "Paid", issued: "01 May 2026" },
+    {
+      id: "INV-2026-08",
+      period: "Aug 2026",
+      amount: "₹48,000",
+      status: "Due",
+      issued: "01 Aug 2026",
+    },
+    {
+      id: "INV-2026-07",
+      period: "Jul 2026",
+      amount: "₹48,000",
+      status: "Paid",
+      issued: "01 Jul 2026",
+    },
+    {
+      id: "INV-2026-06",
+      period: "Jun 2026",
+      amount: "₹44,000",
+      status: "Paid",
+      issued: "01 Jun 2026",
+    },
+    {
+      id: "INV-2026-05",
+      period: "May 2026",
+      amount: "₹44,000",
+      status: "Paid",
+      issued: "01 May 2026",
+    },
   ] as InvoiceRecord[],
 };
 

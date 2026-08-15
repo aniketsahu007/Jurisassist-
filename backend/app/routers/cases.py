@@ -5,8 +5,8 @@ from typing import Optional
 from datetime import datetime
 
 from ..database import get_db
-from ..auth import get_current_user
-from ..models import Case, CaseStatus, TimelineEvent, EventType
+from ..current_user import get_current_user
+from ..models import Case, CaseStatus, CasePriority, TimelineEvent, EventType, Document
 from ..schemas import (
     CaseCreateRequest,
     CaseDetailResponse,
@@ -32,16 +32,35 @@ def _next_hearing_date(case: Case, db: Session) -> Optional[datetime]:
     return event.event_date if event else None
 
 
+def _documents_count(case_id: str, db: Session) -> int:
+    """Count non-deleted documents for a case."""
+    return (
+        db.query(func.count(Document.id))
+        .filter(Document.case_id == case_id, Document.deleted_at.is_(None))
+        .scalar()
+        or 0
+    )
+
+
 def _serialize_case(case: Case, db: Session) -> CaseDetailResponse:
     return CaseDetailResponse(
         id=case.id,
         title=case.title,
+        case_number=case.case_number,
         client_name=case.client_name,
         court_name=case.court_name,
         judge_name=case.judge_name,
         fir_number=case.fir_number,
+        case_type=case.case_type,
         status=case.status,
+        priority=case.priority,
+        summary=case.summary,
+        lead_counsel=case.lead_counsel,
+        statutes=case.statutes or [],
+        filed_on=case.filed_on,
+        documents_count=_documents_count(case.id, db),
         next_hearing_date=_next_hearing_date(case, db),
+        updated_at=case.updated_at,
     )
 
 
@@ -54,7 +73,7 @@ def list_cases(
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
-    """List all cases for the currently authenticated lawyer with pagination and filters."""
+    """List all cases for the current development user with pagination and filters."""
     query = db.query(Case).filter(
         Case.user_id == current_user_id,
         Case.deleted_at.is_(None),  # Exclude soft-deleted cases
@@ -68,10 +87,11 @@ def list_cases(
             Case.title.ilike(f"%{search}%")
             | Case.client_name.ilike(f"%{search}%")
             | Case.fir_number.ilike(f"%{search}%")
+            | Case.case_number.ilike(f"%{search}%")
         )
 
     total = query.count()
-    cases = query.offset((page - 1) * limit).limit(limit).all()
+    cases = query.order_by(Case.updated_at.desc()).offset((page - 1) * limit).limit(limit).all()
 
     return PaginatedCaseResponse(
         items=[_serialize_case(c, db) for c in cases],
@@ -87,15 +107,21 @@ def create_case(
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
-    """Create a new case for the authenticated lawyer."""
+    """Create a new case for the current development user."""
     new_case = Case(
         user_id=current_user_id,
         title=payload.title,
+        case_number=payload.case_number,
         client_name=payload.client_name,
         court_name=payload.court_name,
         judge_name=payload.judge_name,
         fir_number=payload.fir_number,
         case_type=payload.case_type,
+        priority=payload.priority or CasePriority.MEDIUM,
+        summary=payload.summary,
+        lead_counsel=payload.lead_counsel,
+        statutes=payload.statutes or [],
+        filed_on=payload.filed_on,
     )
     db.add(new_case)
     db.commit()
@@ -109,7 +135,7 @@ def get_case(
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
-    """Get a specific case by ID. Enforces strict user ownership."""
+    """Get a specific case by ID. Enforces current-user ownership."""
     case = db.query(Case).filter(
         Case.id == case_id,
         Case.user_id == current_user_id,

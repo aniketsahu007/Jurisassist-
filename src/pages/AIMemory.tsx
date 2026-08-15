@@ -206,7 +206,11 @@ export default function AIMemoryPage() {
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-medium">{s.uses}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    last {new Date(s.lastUsed).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                    last{" "}
+                    {new Date(s.lastUsed).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                    })}
                   </p>
                 </div>
               </li>
@@ -215,7 +219,11 @@ export default function AIMemoryPage() {
         </Panel>
       </div>
 
-      <Panel icon={StickyNote} title="Saved notes" subtitle="Pinned by you, recalled by the assistant">
+      <Panel
+        icon={StickyNote}
+        title="Saved notes"
+        subtitle="Pinned by you, recalled by the assistant"
+      >
         <div className="grid gap-3 md:grid-cols-2">
           {savedNotes.map((n) => (
             <div key={n.id} className="rounded-lg border p-3">

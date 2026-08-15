@@ -180,10 +180,7 @@ export default function PrecedentSearchPage() {
             return (
               <article
                 key={p.id}
-                className={cn(
-                  "panel p-5 transition-colors",
-                  inCompare && "ring-1 ring-primary/40",
-                )}
+                className={cn("panel p-5 transition-colors", inCompare && "ring-1 ring-primary/40")}
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -198,7 +195,12 @@ export default function PrecedentSearchPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={cn("font-display text-2xl font-semibold", relevanceTone(p.relevance))}>
+                    <p
+                      className={cn(
+                        "font-display text-2xl font-semibold",
+                        relevanceTone(p.relevance),
+                      )}
+                    >
                       {p.relevance}%
                     </p>
                     <p className="text-[10px] tracking-wide text-muted-foreground uppercase">

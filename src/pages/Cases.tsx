@@ -9,41 +9,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCases } from "@/hooks/useCases";
-import { caseStatuses, caseTypes, courts } from "@/data/cases";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useCases, useCreateCase } from "@/hooks/useCases";
 import { CaseCard, CaseCardSkeleton } from "@/components/cases/CaseCard";
 import { EmptyState } from "@/components/dashboard/ActivityPanel";
 
 const PAGE_SIZE = 6;
 
+/** Backend CaseStatus enum values mapped to display labels */
+const caseStatusOptions = [
+  { value: "ACTIVE", label: "Active" },
+  { value: "UNDER_TRIAL", label: "Under Trial" },
+  { value: "RESERVED_FOR_JUDGMENT", label: "Reserved for Judgment" },
+  { value: "DISPOSED", label: "Disposed" },
+  { value: "STAYED", label: "Stayed" },
+  { value: "APPEAL_FILED", label: "Appeal Filed" },
+];
+
+const caseTypeOptions = [
+  "Criminal",
+  "Civil",
+  "Corporate",
+  "Family",
+  "Constitutional",
+  "Tax",
+  "Labour",
+  "Property",
+];
+
 export default function CasesPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
-  const [caseType, setCaseType] = useState("all");
-  const [court, setCourt] = useState("all");
   const [sort, setSort] = useState("recent");
   const [page, setPage] = useState(1);
+  const [newCaseOpen, setNewCaseOpen] = useState(false);
 
   const { items, total, pageCount, loading } = useCases({
     search,
     status,
-    caseType,
-    court,
     sort: sort as "recent",
     page,
     pageSize: PAGE_SIZE,
   });
 
+  const createCase = useCreateCase();
+
   const reset = () => {
     setSearch("");
     setStatus("all");
-    setCaseType("all");
-    setCourt("all");
     setPage(1);
   };
 
-  const filtersActive =
-    search !== "" || status !== "all" || caseType !== "all" || court !== "all";
+  const filtersActive = search !== "" || status !== "all";
+
+  const handleCreateCase = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    createCase.mutate(
+      {
+        title: formData.get("title") as string,
+        caseNumber: (formData.get("caseNumber") as string) || undefined,
+        clientName: (formData.get("clientName") as string) || undefined,
+        courtName: (formData.get("courtName") as string) || undefined,
+        caseType: (formData.get("caseType") as string) || undefined,
+      },
+      {
+        onSuccess: () => setNewCaseOpen(false),
+      },
+    );
+  };
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
@@ -55,9 +97,66 @@ export default function CasesPage() {
             {total} {total === 1 ? "matter" : "matters"} matching your view
           </p>
         </div>
-        <Button size="sm">
-          <Plus className="mr-2 h-4 w-4" /> New case
-        </Button>
+
+        <Dialog open={newCaseOpen} onOpenChange={setNewCaseOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm">
+              <Plus className="mr-2 h-4 w-4" /> New case
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+              <DialogTitle>Create a new case</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateCase} className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="title">Case title *</Label>
+                <Input id="title" name="title" required placeholder="e.g. State v. John Doe" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="caseNumber">Case number</Label>
+                  <Input id="caseNumber" name="caseNumber" placeholder="CRL.A. 482/2024" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clientName">Client name</Label>
+                  <Input id="clientName" name="clientName" placeholder="Client name" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="courtName">Court</Label>
+                  <Input id="courtName" name="courtName" placeholder="Bombay High Court" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="caseType">Case type</Label>
+                  <select
+                    id="caseType"
+                    name="caseType"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    <option value="">Select type</option>
+                    {caseTypeOptions.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" size="sm">
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button type="submit" size="sm" disabled={createCase.isPending}>
+                  {createCase.isPending ? "Creating…" : "Create case"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="panel flex flex-col gap-3 p-4 lg:flex-row lg:items-center">
@@ -76,37 +175,25 @@ export default function CasesPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           <SlidersHorizontal className="hidden h-4 w-4 text-muted-foreground lg:block" />
-          <FilterSelect
+          <Select
             value={status}
-            onChange={(v) => {
+            onValueChange={(v) => {
               setStatus(v);
               setPage(1);
             }}
-            placeholder="Status"
-            options={caseStatuses}
-            allLabel="All statuses"
-          />
-          <FilterSelect
-            value={caseType}
-            onChange={(v) => {
-              setCaseType(v);
-              setPage(1);
-            }}
-            placeholder="Type"
-            options={caseTypes}
-            allLabel="All types"
-          />
-          <FilterSelect
-            value={court}
-            onChange={(v) => {
-              setCourt(v);
-              setPage(1);
-            }}
-            placeholder="Court"
-            options={courts}
-            allLabel="All courts"
-            wide
-          />
+          >
+            <SelectTrigger className="h-9 w-[180px] text-xs">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {caseStatusOptions.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className="h-9 w-[168px] text-xs">
               <SelectValue />
@@ -184,37 +271,5 @@ export default function CasesPage() {
         </div>
       )}
     </div>
-  );
-}
-
-function FilterSelect({
-  value,
-  onChange,
-  placeholder,
-  options,
-  allLabel,
-  wide,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  options: string[];
-  allLabel: string;
-  wide?: boolean;
-}) {
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={wide ? "h-9 w-[200px] text-xs" : "h-9 w-[150px] text-xs"}>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">{allLabel}</SelectItem>
-        {options.map((o) => (
-          <SelectItem key={o} value={o}>
-            {o}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   );
 }

@@ -12,10 +12,7 @@ export function useNotificationCenter() {
   const [unreadOnly, setUnreadOnly] = useState(false);
 
   const filtered = useMemo(
-    () =>
-      items.filter(
-        (n) => (type === "all" || n.type === type) && (!unreadOnly || !n.read),
-      ),
+    () => items.filter((n) => (type === "all" || n.type === type) && (!unreadOnly || !n.read)),
     [items, type, unreadOnly],
   );
 

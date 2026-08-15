@@ -1,36 +1,18 @@
 /**
  * Centralized API client for jurisAssist.
  *
- * All requests automatically include the Clerk JWT token in the
- * Authorization header. Swap BASE_URL via VITE_API_URL env var
- * for production deployments.
+ * Swap BASE_URL via VITE_API_URL env var for production deployments.
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
-async function getAuthToken(): Promise<string | null> {
-  // Clerk exposes the session token via a global helper once ClerkProvider is mounted.
-  // We use the dynamic import to avoid a hard dependency at module init time.
-  try {
-    const { default: Clerk } = await import("@clerk/clerk-react");
-    // @ts-ignore — clerk singleton access
-    const session = window.Clerk?.session;
-    if (!session) return null;
-    return await session.getToken();
-  } catch {
-    return null;
-  }
+export function getApiBaseUrl() {
+  return BASE_URL;
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const token = await getAuthToken();
-
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
@@ -38,23 +20,48 @@ async function request<T>(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message ?? `API error ${res.status}`);
+    throw new Error(error.detail ?? error.message ?? `API error ${res.status}`);
   }
 
   if (res.status === 204) return undefined as T;
   return res.json();
 }
 
+export const systemApi = {
+  health: async () => {
+    const res = await fetch(`${BASE_URL}/health`);
+    if (!res.ok) {
+      throw new Error(`Backend health check failed: ${res.status}`);
+    }
+    return res.json() as Promise<{ status: string; message: string }>;
+  },
+};
+
 // ---- Cases ----
+
+export type CaseStatusEnum =
+  "ACTIVE" | "UNDER_TRIAL" | "RESERVED_FOR_JUDGMENT" | "DISPOSED" | "STAYED" | "APPEAL_FILED";
+
+export type CasePriorityEnum = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+
 export interface ApiCase {
   id: string;
   title: string;
+  caseNumber?: string;
   clientName?: string;
   courtName?: string;
   judgeName?: string;
   firNumber?: string;
-  status: string;
+  caseType?: string;
+  status: CaseStatusEnum;
+  priority: CasePriorityEnum;
+  summary?: string;
+  leadCounsel?: string;
+  statutes?: string[];
+  filedOn?: string;
+  documentsCount: number;
   nextHearingDate?: string;
+  updatedAt?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -66,11 +73,17 @@ export interface PaginatedResponse<T> {
 
 export interface CreateCasePayload {
   title: string;
+  caseNumber?: string;
   clientName?: string;
   courtName?: string;
   judgeName?: string;
   firNumber?: string;
   caseType?: string;
+  priority?: CasePriorityEnum;
+  summary?: string;
+  leadCounsel?: string;
+  statutes?: string[];
+  filedOn?: string;
 }
 
 export const casesApi = {
@@ -123,15 +136,18 @@ export const documentsApi = {
       {
         method: "POST",
         body: JSON.stringify({ filename: file.name, mimeType: file.type }),
-      }
+      },
     );
 
     // Upload directly to Supabase — no file bytes touch our FastAPI server
-    await fetch(presignedUrl, {
+    const uploadResponse = await fetch(presignedUrl, {
       method: "PUT",
       headers: { "Content-Type": file.type },
       body: file,
     });
+    if (!uploadResponse.ok) {
+      throw new Error(`Storage upload failed: ${uploadResponse.statusText}`);
+    }
 
     // Confirm and trigger AI processing
     await request<void>(`/api/v1/documents/${docId}/confirm`, { method: "POST" });

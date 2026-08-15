@@ -83,9 +83,21 @@ const capabilities = [
 
 const architecture = [
   { icon: Layers, label: "React + TypeScript UI", note: "Responsive workspace, dark and light" },
-  { icon: Workflow, label: "FastAPI service layer", note: "Ingestion, OCR and report orchestration" },
-  { icon: Database, label: "Vector + relational stores", note: "ChromaDB embeddings, PostgreSQL records" },
-  { icon: Sparkles, label: "Multi-model AI routing", note: "Long-context analysis and fast drafting" },
+  {
+    icon: Workflow,
+    label: "FastAPI service layer",
+    note: "Ingestion, OCR and report orchestration",
+  },
+  {
+    icon: Database,
+    label: "Vector + relational stores",
+    note: "ChromaDB embeddings, PostgreSQL records",
+  },
+  {
+    icon: Sparkles,
+    label: "Multi-model AI routing",
+    note: "Long-context analysis and fast drafting",
+  },
 ];
 
 const plans = [
@@ -93,7 +105,12 @@ const plans = [
     name: "Solo",
     price: "₹4,900",
     note: "per advocate / month",
-    points: ["Up to 25 active matters", "Document intelligence", "Precedent search", "Email support"],
+    points: [
+      "Up to 25 active matters",
+      "Document intelligence",
+      "Precedent search",
+      "Email support",
+    ],
     highlight: false,
   },
   {
@@ -112,7 +129,12 @@ const plans = [
     name: "Firm",
     price: "Custom",
     note: "billed annually",
-    points: ["Unlimited seats", "SSO and audit logging", "Private model routing", "Dedicated success manager"],
+    points: [
+      "Unlimited seats",
+      "Audit logging",
+      "Private model routing",
+      "Dedicated success manager",
+    ],
     highlight: false,
   },
 ];
@@ -166,11 +188,21 @@ export default function LandingPage() {
           </div>
           <span className="font-display text-lg font-semibold">jurisAssist</span>
           <nav className="ml-8 hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <a href="#features" className="transition-colors hover:text-foreground">Features</a>
-            <a href="#capabilities" className="transition-colors hover:text-foreground">AI</a>
-            <a href="#architecture" className="transition-colors hover:text-foreground">Architecture</a>
-            <a href="#pricing" className="transition-colors hover:text-foreground">Pricing</a>
-            <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
+            <a href="#features" className="transition-colors hover:text-foreground">
+              Features
+            </a>
+            <a href="#capabilities" className="transition-colors hover:text-foreground">
+              AI
+            </a>
+            <a href="#architecture" className="transition-colors hover:text-foreground">
+              Architecture
+            </a>
+            <a href="#pricing" className="transition-colors hover:text-foreground">
+              Pricing
+            </a>
+            <a href="#faq" className="transition-colors hover:text-foreground">
+              FAQ
+            </a>
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
@@ -195,8 +227,9 @@ export default function LandingPage() {
               Legal intelligence for chambers that argue at pace
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              jurisAssist reads your chargesheets, builds the chronology, finds the precedent and drafts
-              the submission — so counsel spends the morning arguing, not assembling the brief.
+              jurisAssist reads your chargesheets, builds the chronology, finds the precedent and
+              drafts the submission — so counsel spends the morning arguing, not assembling the
+              brief.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" asChild>
@@ -334,11 +367,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button
-                className="mt-6 w-full"
-                variant={p.highlight ? "default" : "outline"}
-                asChild
-              >
+              <Button className="mt-6 w-full" variant={p.highlight ? "default" : "outline"} asChild>
                 <Link to="/">Start with {p.name}</Link>
               </Button>
             </div>
@@ -382,7 +411,8 @@ export default function LandingPage() {
                 <MapPin className="h-4 w-4 text-primary" /> Maker Chambers IV, Nariman Point, Mumbai
               </li>
               <li className="flex items-center gap-3">
-                <MessageSquareText className="h-4 w-4 text-primary" /> WhatsApp support, 9 AM–9 PM IST
+                <MessageSquareText className="h-4 w-4 text-primary" /> WhatsApp support, 9 AM–9 PM
+                IST
               </li>
             </ul>
           </div>

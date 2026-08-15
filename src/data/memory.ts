@@ -168,12 +168,48 @@ export const successfulArguments: ArgumentMemory[] = [
 ];
 
 export const frequentSections: SectionUsage[] = [
-  { id: "sec-1", section: "S. 65B", act: "Indian Evidence Act, 1872", uses: 38, lastUsed: "2026-07-28" },
-  { id: "sec-2", section: "S. 482", act: "Code of Criminal Procedure, 1973", uses: 31, lastUsed: "2026-07-21" },
-  { id: "sec-3", section: "S. 438", act: "Code of Criminal Procedure, 1973", uses: 27, lastUsed: "2026-08-01" },
-  { id: "sec-4", section: "S. 420", act: "Indian Penal Code, 1860", uses: 24, lastUsed: "2026-07-30" },
-  { id: "sec-5", section: "S. 409", act: "Indian Penal Code, 1860", uses: 18, lastUsed: "2026-06-17" },
-  { id: "sec-6", section: "S. 45", act: "Prevention of Money Laundering Act, 2002", uses: 12, lastUsed: "2026-05-09" },
+  {
+    id: "sec-1",
+    section: "S. 65B",
+    act: "Indian Evidence Act, 1872",
+    uses: 38,
+    lastUsed: "2026-07-28",
+  },
+  {
+    id: "sec-2",
+    section: "S. 482",
+    act: "Code of Criminal Procedure, 1973",
+    uses: 31,
+    lastUsed: "2026-07-21",
+  },
+  {
+    id: "sec-3",
+    section: "S. 438",
+    act: "Code of Criminal Procedure, 1973",
+    uses: 27,
+    lastUsed: "2026-08-01",
+  },
+  {
+    id: "sec-4",
+    section: "S. 420",
+    act: "Indian Penal Code, 1860",
+    uses: 24,
+    lastUsed: "2026-07-30",
+  },
+  {
+    id: "sec-5",
+    section: "S. 409",
+    act: "Indian Penal Code, 1860",
+    uses: 18,
+    lastUsed: "2026-06-17",
+  },
+  {
+    id: "sec-6",
+    section: "S. 45",
+    act: "Prevention of Money Laundering Act, 2002",
+    uses: 12,
+    lastUsed: "2026-05-09",
+  },
 ];
 
 export const savedNotes: SavedNote[] = [

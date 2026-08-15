@@ -196,8 +196,7 @@
   /* Scrollbars: slim, token-coloured, consistent across themes */
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in oklab, var(--color-muted-foreground) 35%, transparent)
-      transparent;
+    scrollbar-color: color-mix(in oklab, var(--color-muted-foreground) 35%, transparent) transparent;
   }
 
   ::-webkit-scrollbar {
@@ -232,7 +231,6 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-panel);
 }
-
 
 @utility text-eyebrow {
   font-size: 0.6875rem;

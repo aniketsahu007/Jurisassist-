@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   Briefcase,
@@ -14,7 +15,9 @@ import {
   Settings,
   Scale,
   Globe,
+  Server,
 } from "lucide-react";
+import { systemApi } from "@/lib/api";
 import {
   Sidebar,
   SidebarContent,
@@ -54,6 +57,13 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const backendStatus = useQuery({
+    queryKey: ["system", "health"],
+    queryFn: systemApi.health,
+    refetchInterval: 30000,
+    retry: 1,
+  });
+  const backendSynced = backendStatus.data?.status === "ok";
 
   const renderGroup = (label: string, items: typeof workspace) => (
     <SidebarGroup>
@@ -94,9 +104,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <p className="font-display text-base leading-none font-semibold">jurisAssist</p>
-              <p className="mt-1 truncate text-[11px] text-muted-foreground">
-                Legal Intelligence
-              </p>
+              <p className="mt-1 truncate text-[11px] text-muted-foreground">Legal Intelligence</p>
             </div>
           )}
         </div>
@@ -111,6 +119,25 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         {!collapsed ? (
           <div className="space-y-2">
+            <div className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground">
+              <span
+                className={
+                  backendSynced
+                    ? "h-2 w-2 rounded-full bg-emerald-500"
+                    : backendStatus.isLoading
+                      ? "h-2 w-2 rounded-full bg-amber-500"
+                      : "h-2 w-2 rounded-full bg-destructive"
+                }
+              />
+              <Server className="h-3.5 w-3.5" />
+              <span>
+                {backendSynced
+                  ? "Backend active"
+                  : backendStatus.isLoading
+                    ? "Checking backend"
+                    : "Backend inactive"}
+              </span>
+            </div>
             <Link
               to="/landing"
               className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
@@ -118,16 +145,18 @@ export function AppSidebar() {
               <Globe className="h-3.5 w-3.5" />
               <span>View marketing site</span>
             </Link>
-            <div className="rounded-lg bg-sidebar-accent p-3">
-              <p className="text-eyebrow">Backend</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Running on local mock data. API integration pending.
-              </p>
-            </div>
           </div>
         ) : (
           <div className="flex justify-center py-2">
-            <span className="h-2 w-2 rounded-full bg-warning" />
+            <span
+              className={
+                backendSynced
+                  ? "h-2 w-2 rounded-full bg-emerald-500"
+                  : backendStatus.isLoading
+                    ? "h-2 w-2 rounded-full bg-amber-500"
+                    : "h-2 w-2 rounded-full bg-destructive"
+              }
+            />
           </div>
         )}
       </SidebarFooter>

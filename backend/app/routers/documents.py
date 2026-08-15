@@ -2,12 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
 
 from ..database import get_db
-from ..auth import get_current_user
+from ..current_user import get_current_user
 from ..models import Case, Document, DocumentStatus
-from ..schemas import DocumentSummary, DocumentStatusResponse, PaginatedDocumentResponse
+from ..schemas import (
+    BaseSchema,
+    DocumentSummary,
+    DocumentStatusResponse,
+    DocumentUploadRequest,
+    DocumentUploadResponse,
+    PaginatedDocumentResponse,
+)
 from ..storage import create_signed_upload_url, create_signed_download_url
 
 router = APIRouter(tags=["Documents"])
@@ -15,17 +21,7 @@ router = APIRouter(tags=["Documents"])
 
 # --- Request/Response helpers ---
 
-class DocumentUploadRequest(BaseModel):
-    filename: str
-    mime_type: str
-
-
-class DocumentUploadResponse(BaseModel):
-    doc_id: str
-    presigned_url: str
-
-
-class DocumentDetailResponse(BaseModel):
+class DocumentDetailResponse(BaseSchema):
     id: str
     filename: str
     status: DocumentStatus

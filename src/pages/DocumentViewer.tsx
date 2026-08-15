@@ -156,12 +156,24 @@ export default function DocumentViewerPage() {
           <Tabs defaultValue="sections">
             <div className="overflow-x-auto border-b px-3 py-2">
               <TabsList className="w-max">
-                <TabsTrigger value="sections" className="text-xs">Sections</TabsTrigger>
-                <TabsTrigger value="timeline" className="text-xs">Timeline</TabsTrigger>
-                <TabsTrigger value="metadata" className="text-xs">Metadata</TabsTrigger>
-                <TabsTrigger value="entities" className="text-xs">Entities</TabsTrigger>
-                <TabsTrigger value="highlights" className="text-xs">Highlights</TabsTrigger>
-                <TabsTrigger value="annotations" className="text-xs">Annotations</TabsTrigger>
+                <TabsTrigger value="sections" className="text-xs">
+                  Sections
+                </TabsTrigger>
+                <TabsTrigger value="timeline" className="text-xs">
+                  Timeline
+                </TabsTrigger>
+                <TabsTrigger value="metadata" className="text-xs">
+                  Metadata
+                </TabsTrigger>
+                <TabsTrigger value="entities" className="text-xs">
+                  Entities
+                </TabsTrigger>
+                <TabsTrigger value="highlights" className="text-xs">
+                  Highlights
+                </TabsTrigger>
+                <TabsTrigger value="annotations" className="text-xs">
+                  Annotations
+                </TabsTrigger>
               </TabsList>
             </div>
 

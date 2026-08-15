@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from .models import CaseStatus, DocumentStatus, EntityType, CitationStatus
+from .models import CaseStatus, CasePriority, DocumentStatus, EntityType, CitationStatus
 
 def to_camel(string: str) -> str:
     parts = iter(string.split('_'))
@@ -23,21 +23,36 @@ class ErrorResponse(BaseSchema):
 # --- Case Schemas ---
 class CaseCreateRequest(BaseSchema):
     title: str
+    case_number: Optional[str] = None
     client_name: Optional[str] = None
     court_name: Optional[str] = None
     judge_name: Optional[str] = None
     fir_number: Optional[str] = None
     case_type: Optional[str] = None
+    priority: Optional[CasePriority] = CasePriority.MEDIUM
+    summary: Optional[str] = None
+    lead_counsel: Optional[str] = None
+    statutes: Optional[List[str]] = None
+    filed_on: Optional[datetime] = None
 
 class CaseDetailResponse(BaseSchema):
     id: str
     title: str
+    case_number: Optional[str] = None
     client_name: Optional[str] = None
     court_name: Optional[str] = None
     judge_name: Optional[str] = None
     fir_number: Optional[str] = None
+    case_type: Optional[str] = None
     status: CaseStatus
+    priority: CasePriority
+    summary: Optional[str] = None
+    lead_counsel: Optional[str] = None
+    statutes: Optional[List[str]] = None
+    filed_on: Optional[datetime] = None
+    documents_count: int = 0
     next_hearing_date: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 class PaginatedCaseResponse(BaseSchema):
     items: List[CaseDetailResponse]

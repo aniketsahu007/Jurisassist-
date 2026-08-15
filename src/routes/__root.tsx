@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -108,26 +108,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-
-
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const isMarketing = pathname === "/landing";
+
+  // Public pages that don't need the app shell layout
+  const isPublicPage = pathname === "/landing";
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        {isMarketing ? (
-          // Public marketing page renders outside the authenticated app shell.
+    <ThemeProvider>
+      {isPublicPage ? (
+        // Render public pages directly
+        <Outlet />
+      ) : (
+        <AppShell>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
-        ) : (
-          <AppShell>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </AppShell>
-        )}
-      </ThemeProvider>
-    </QueryClientProvider>
+        </AppShell>
+      )}
+    </ThemeProvider>
   );
 }

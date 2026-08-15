@@ -2,7 +2,6 @@ import {
   Building2,
   Database,
   Globe,
-  KeyRound,
   Languages,
   MonitorSmartphone,
   Plug,
@@ -165,26 +164,26 @@ export default function SettingsPage() {
           <section className="panel p-5">
             <div className="mb-4 flex items-center gap-3">
               <Shield className="h-4 w-4 text-primary" />
-              <h2 className="font-display text-base font-semibold">Access & authentication</h2>
+              <h2 className="font-display text-base font-semibold">Data protection</h2>
             </div>
             <ul className="space-y-3">
               {[
                 {
-                  id: "mfa",
-                  label: "Two-factor authentication",
-                  desc: "Require an authenticator code for every new device.",
+                  id: "export-watermark",
+                  label: "Privilege lock on exports",
+                  desc: "Watermark and log every case bundle leaving the workspace.",
                   on: true,
                 },
                 {
-                  id: "sso",
-                  label: "Chamber SSO",
-                  desc: "Allow associates to sign in with the firm identity provider.",
-                  on: false,
+                  id: "retention-review",
+                  label: "Retention review reminders",
+                  desc: "Flag inactive matters for document retention review.",
+                  on: true,
                 },
                 {
-                  id: "privilege",
-                  label: "Privilege lock on exports",
-                  desc: "Watermark and log every case bundle leaving the workspace.",
+                  id: "audit-notes",
+                  label: "Audit notes on downloads",
+                  desc: "Record a note when case files are downloaded.",
                   on: true,
                 },
               ].map((r) => (
@@ -202,25 +201,25 @@ export default function SettingsPage() {
             <Separator className="my-4" />
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label>Session timeout</Label>
-                <Select defaultValue="60">
+                <Label>Export watermark</Label>
+                <Select defaultValue="case-client">
                   <SelectTrigger className="mt-1.5">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="30">30 minutes</SelectItem>
-                    <SelectItem value="60">1 hour</SelectItem>
-                    <SelectItem value="480">8 hours</SelectItem>
+                    <SelectItem value="case-client">Case and client name</SelectItem>
+                    <SelectItem value="case-only">Case name only</SelectItem>
+                    <SelectItem value="none">No watermark</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="pw">Change password</Label>
-                <Input id="pw" type="password" placeholder="••••••••••" className="mt-1.5" />
+                <Label htmlFor="retention">Retention review window</Label>
+                <Input id="retention" placeholder="90 days" className="mt-1.5" />
               </div>
             </div>
             <Button className="mt-4" variant="outline" disabled>
-              <KeyRound className="mr-2 h-4 w-4" /> Update credentials
+              Save protection settings
             </Button>
           </section>
 
@@ -275,7 +274,10 @@ export default function SettingsPage() {
                         <Badge variant="outline" className="text-[10px]">
                           {i.category}
                         </Badge>
-                        <Badge variant="outline" className={cn("text-[10px]", statusTone[i.status])}>
+                        <Badge
+                          variant="outline"
+                          className={cn("text-[10px]", statusTone[i.status])}
+                        >
                           {i.status}
                         </Badge>
                       </div>

@@ -16,10 +16,7 @@ import { cn } from "@/lib/utils";
 import { useNotificationCenter } from "@/hooks/useNotificationCenter";
 import type { NotificationType } from "@/data/notifications";
 
-const typeMeta: Record<
-  NotificationType,
-  { icon: typeof Bell; tone: string; dot: string }
-> = {
+const typeMeta: Record<NotificationType, { icon: typeof Bell; tone: string; dot: string }> = {
   "Upcoming Hearing": {
     icon: CalendarClock,
     tone: "bg-primary/10 text-primary border-primary/20",
@@ -150,7 +147,10 @@ export default function NotificationsPage() {
                     {n.type}
                   </Badge>
                   {n.priority === "high" && (
-                    <Badge variant="outline" className="border-destructive/20 bg-destructive/10 text-[10px] text-destructive">
+                    <Badge
+                      variant="outline"
+                      className="border-destructive/20 bg-destructive/10 text-[10px] text-destructive"
+                    >
                       High priority
                     </Badge>
                   )}

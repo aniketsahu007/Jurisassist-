@@ -132,7 +132,8 @@ export default function AIReportPage() {
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="gap-1.5">
                 <FileBarChart className="h-3 w-3 text-primary" />
-                {report.documentsAnalysed} documents · {report.pagesAnalysed.toLocaleString("en-IN")} pages
+                {report.documentsAnalysed} documents ·{" "}
+                {report.pagesAnalysed.toLocaleString("en-IN")} pages
               </Badge>
               <Badge variant="outline">{report.model}</Badge>
               <span className="text-xs text-muted-foreground">

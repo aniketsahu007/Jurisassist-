@@ -15,11 +15,7 @@ import { Gavel, Network, ThumbsDown, TrendingUp, ScrollText, Trophy } from "luci
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip as UiTooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip as UiTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { usePatterns } from "@/hooks/usePatterns";
 
@@ -115,7 +111,11 @@ export default function PatternAnalysisPage() {
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={successTrend} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="quarter" {...axis} />
                   <YAxis {...axis} unit="%" />
                   <Tooltip contentStyle={tooltipStyle} />
@@ -160,8 +160,15 @@ export default function PatternAnalysisPage() {
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sectionOutcomes} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <BarChart
+                  data={sectionOutcomes}
+                  margin={{ top: 8, right: 8, left: -18, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="section" {...axis} interval={0} angle={-18} dy={10} height={48} />
                   <YAxis {...axis} />
                   <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "var(--color-muted)" }} />
@@ -303,7 +310,10 @@ export default function PatternAnalysisPage() {
                 <li key={r.id} className="rounded-lg border p-3">
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-sm leading-relaxed">{r.argument}</p>
-                    <Badge variant="outline" className="shrink-0 border-destructive/20 bg-destructive/10 text-destructive">
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 border-destructive/20 bg-destructive/10 text-destructive"
+                    >
                       {r.rejections}×
                     </Badge>
                   </div>

@@ -25,10 +25,7 @@ const stageIcon: Record<TimelineStage, typeof Gavel> = {
   Judgment: ScrollText,
 };
 
-const statusStyles: Record<
-  TimelineStatus,
-  { dot: string; badge: string; label: string }
-> = {
+const statusStyles: Record<TimelineStatus, { dot: string; badge: string; label: string }> = {
   completed: {
     dot: "bg-success text-success-foreground",
     badge: "border-success/25 bg-success/12 text-success",

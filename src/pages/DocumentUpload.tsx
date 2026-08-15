@@ -17,8 +17,16 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useRecentUploads } from "@/hooks/useDocuments";
+import { useRecentUploads, useUploadDocument } from "@/hooks/useDocuments";
+import { useCases } from "@/hooks/useCases";
 import {
   acceptedFormats,
   kindFromFileName,
@@ -41,6 +49,22 @@ const kindTint: Record<DocumentKind, string> = {
   docx: "bg-chart-1/12 text-chart-1",
   audio: "bg-accent/15 text-accent",
   video: "bg-success/12 text-success",
+};
+
+const docStatusTint: Record<string, string> = {
+  COMPLETED: "border-success/25 bg-success/12 text-success",
+  FAILED: "border-destructive/25 bg-destructive/12 text-destructive",
+  UPLOADED: "border-accent/25 bg-accent/12 text-accent",
+  PROCESSING_OCR: "border-accent/25 bg-accent/12 text-accent",
+  PROCESSING_AI: "border-accent/25 bg-accent/12 text-accent",
+};
+
+const docStatusLabel: Record<string, string> = {
+  COMPLETED: "Ingested",
+  FAILED: "Failed",
+  UPLOADED: "Uploaded",
+  PROCESSING_OCR: "Processing",
+  PROCESSING_AI: "Processing",
 };
 
 interface QueuedUpload {
@@ -72,87 +96,85 @@ function fmtWhen(iso: string) {
 export default function DocumentUploadPage() {
   const [queue, setQueue] = useState<QueuedUpload[]>([]);
   const [dragging, setDragging] = useState(false);
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const timers = useRef<ReturnType<typeof setInterval>[]>([]);
-  const { items: recent, loading } = useRecentUploads();
 
-  useEffect(() => {
-    const t = timers.current;
-    return () => t.forEach(clearInterval);
-  }, []);
+  // Fetch cases for the case selector
+  const { items: cases, loading: casesLoading } = useCases({ pageSize: 100 });
 
-  const simulate = useCallback((id: string, willFail: boolean) => {
-    const interval = setInterval(() => {
-      setQueue((prev) =>
-        prev.map((f) => {
-          if (f.id !== id || f.status === "success" || f.status === "error") return f;
-          const next = Math.min(100, f.progress + Math.random() * 18 + 6);
-          if (next >= 100) {
-            clearInterval(interval);
-            return willFail
-              ? {
-                  ...f,
-                  progress: 100,
-                  status: "error",
-                  message:
-                    "Upload rejected — file exceeds the 250 MB ingestion limit. Split the exhibit and retry.",
-                }
-              : {
-                  ...f,
-                  progress: 100,
-                  status: "success",
-                  message: "Ingested · OCR queued · entities will be extracted shortly",
-                };
-          }
-          return {
-            ...f,
-            progress: next,
-            status: next > 82 ? "processing" : "uploading",
-          };
-        }),
-      );
-    }, 320);
-    timers.current.push(interval);
-  }, []);
+  // Fetch recent uploads for the selected case
+  const { items: recent, loading: recentLoading } = useRecentUploads(selectedCaseId || undefined);
+
+  // Real upload mutation
+  const uploadMutation = useUploadDocument(selectedCaseId || undefined);
 
   const addFiles = useCallback(
     (files: FileList | File[]) => {
       const list = Array.from(files);
       if (!list.length) return;
-      const queued: QueuedUpload[] = list.map((file, i) => {
+
+      if (!selectedCaseId) {
+        alert("Please select a case before uploading documents.");
+        return;
+      }
+
+      list.forEach((file) => {
         const kind = kindFromFileName(file.name);
-        return {
-          id: `${Date.now()}-${i}-${file.name}`,
+        const id = `${Date.now()}-${file.name}`;
+
+        const entry: QueuedUpload = {
+          id,
           name: file.name,
           kind,
           sizeLabel: formatBytes(file.size),
           progress: 0,
-          status: "queued",
+          status: "uploading",
           thumbnail:
-            kind === "image" && typeof URL !== "undefined"
-              ? URL.createObjectURL(file)
-              : undefined,
+            kind === "image" && typeof URL !== "undefined" ? URL.createObjectURL(file) : undefined,
         };
+
+        setQueue((prev) => [entry, ...prev]);
+
+        // Real upload via the mutation
+        uploadMutation.mutate(file, {
+          onSuccess: () => {
+            setQueue((prev) =>
+              prev.map((q) =>
+                q.id === id
+                  ? {
+                      ...q,
+                      progress: 100,
+                      status: "success" as UploadStatus,
+                      message: "Uploaded · OCR queued · entities will be extracted shortly",
+                    }
+                  : q,
+              ),
+            );
+          },
+          onError: (error) => {
+            setQueue((prev) =>
+              prev.map((q) =>
+                q.id === id
+                  ? {
+                      ...q,
+                      progress: 100,
+                      status: "error" as UploadStatus,
+                      message: error instanceof Error ? error.message : "Upload failed",
+                    }
+                  : q,
+              ),
+            );
+          },
+        });
       });
-      setQueue((prev) => [...queued, ...prev]);
-      queued.forEach((q, i) => simulate(q.id, i > 0 && files.length > 2 && i % 4 === 3));
     },
-    [simulate],
+    [selectedCaseId, uploadMutation],
   );
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
     if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
-  };
-
-  const retry = (id: string) => {
-    setQueue((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, progress: 0, status: "uploading", message: undefined } : f,
-      ),
-    );
-    simulate(id, false);
   };
 
   const successCount = queue.filter((q) => q.status === "success").length;
@@ -165,15 +187,32 @@ export default function DocumentUploadPage() {
           <p className="text-eyebrow">Documents</p>
           <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">Upload &amp; ingestion</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Pleadings, exhibits, hearing recordings and site footage — processed locally in this
-            preview build.
+            Upload case documents for AI-powered extraction and analysis.
           </p>
         </div>
-        <Button size="sm" variant="outline" asChild>
-          <Link to="/documents/$documentId" params={{ documentId: "d-9001" }}>
-            Open document viewer <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+      </div>
+
+      {/* Case selector */}
+      <div className="panel p-4">
+        <label className="text-sm font-medium">Select a case to upload documents to:</label>
+        <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+          <SelectTrigger className="mt-2 h-9 w-full max-w-md text-sm">
+            <SelectValue placeholder={casesLoading ? "Loading cases…" : "Choose a case"} />
+          </SelectTrigger>
+          <SelectContent>
+            {cases.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.caseNumber ? `${c.caseNumber} — ` : ""}
+                {c.title}
+              </SelectItem>
+            ))}
+            {cases.length === 0 && !casesLoading && (
+              <SelectItem value="__none" disabled>
+                No cases found — create one first
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -191,6 +230,7 @@ export default function DocumentUploadPage() {
             onDrop={onDrop}
             className={cn(
               "panel flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed px-6 py-14 text-center transition-colors",
+              !selectedCaseId && "opacity-50 pointer-events-none",
               dragging ? "border-accent bg-accent/8" : "border-border hover:border-accent/60",
             )}
           >
@@ -202,7 +242,9 @@ export default function DocumentUploadPage() {
                 {dragging ? "Release to queue these files" : "Drag and drop case files here"}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                or click to browse — PDF, images, DOCX, audio and video up to 250 MB each
+                {selectedCaseId
+                  ? "or click to browse — PDF, images, DOCX, audio and video up to 250 MB each"
+                  : "Select a case above before uploading"}
               </p>
             </div>
             <input
@@ -307,25 +349,12 @@ export default function DocumentUploadPage() {
                           <Progress value={f.progress} className="mt-2 h-1.5" />
                           <p className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            {f.status === "processing"
-                              ? "Running OCR and entity extraction…"
-                              : `Uploading · ${Math.round(f.progress)}%`}
+                            Uploading…
                           </p>
                         </>
                       )}
                     </div>
                     <div className="flex shrink-0 gap-1">
-                      {f.status === "error" && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => retry(f.id)}
-                          aria-label="Retry upload"
-                        >
-                          <RotateCw className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -345,63 +374,58 @@ export default function DocumentUploadPage() {
 
         <aside className="panel h-fit">
           <div className="border-b px-5 py-3">
-            <p className="text-eyebrow">Recently uploaded files</p>
+            <p className="text-eyebrow">
+              {selectedCaseId ? "Documents in this case" : "Select a case to view documents"}
+            </p>
           </div>
           <div className="divide-y">
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="space-y-2 px-5 py-4">
-                    <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
-                    <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
-                  </div>
-                ))
-              : recent.map((f) => {
-                  const Icon = kindIcon[f.kind];
-                  return (
-                    <div key={f.id} className="flex gap-3 px-5 py-4">
-                      <div
-                        className={cn(
-                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-md",
-                          kindTint[f.kind],
-                        )}
-                      >
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-medium">{f.name}</p>
-                        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                          {f.caseNumber} · {f.sizeLabel}
-                          {f.pages > 0 ? ` · ${f.pages} pp.` : ""}
-                        </p>
-                        <p className="mt-1.5 line-clamp-2 text-[11px] text-muted-foreground">
-                          {f.note}
-                        </p>
-                        <div className="mt-1.5 flex items-center gap-2">
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-[10px]",
-                              f.status === "success"
-                                ? "border-success/25 bg-success/12 text-success"
-                                : f.status === "error"
-                                  ? "border-destructive/25 bg-destructive/12 text-destructive"
-                                  : "border-accent/25 bg-accent/12 text-accent",
-                            )}
-                          >
-                            {f.status === "success"
-                              ? "Ingested"
-                              : f.status === "error"
-                                ? "Failed"
-                                : "Processing"}
-                          </Badge>
-                          <span className="text-[10px] text-muted-foreground">
-                            {fmtWhen(f.uploadedAt)}
-                          </span>
-                        </div>
+            {!selectedCaseId ? (
+              <div className="px-5 py-8 text-center text-xs text-muted-foreground">
+                Choose a case above to see its documents.
+              </div>
+            ) : recentLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-2 px-5 py-4">
+                  <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+                </div>
+              ))
+            ) : recent.length === 0 ? (
+              <div className="px-5 py-8 text-center text-xs text-muted-foreground">
+                No documents uploaded yet.
+              </div>
+            ) : (
+              recent.map((f) => {
+                const kind = kindFromFileName(f.filename);
+                const Icon = kindIcon[kind];
+                return (
+                  <div key={f.id} className="flex gap-3 px-5 py-4">
+                    <div
+                      className={cn(
+                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-md",
+                        kindTint[kind],
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-medium">{f.filename}</p>
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={cn("text-[10px]", docStatusTint[f.status])}
+                        >
+                          {docStatusLabel[f.status] ?? f.status}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground">
+                          {fmtWhen(f.createdAt)}
+                        </span>
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                );
+              })
+            )}
           </div>
         </aside>
       </div>

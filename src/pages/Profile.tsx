@@ -173,58 +173,64 @@ export default function ProfilePage() {
             }
           >
             <div className="w-full overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Label</TableHead>
-                  <TableHead>Key</TableHead>
-                  <TableHead className="hidden md:table-cell">Scope</TableHead>
-                  <TableHead className="hidden sm:table-cell">Last used</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {apiKeys.map((k) => (
-                  <TableRow key={k.id}>
-                    <TableCell className="font-medium">{k.label}</TableCell>
-                    <TableCell className="font-mono text-xs">{k.maskedKey}</TableCell>
-                    <TableCell className="hidden font-mono text-xs text-muted-foreground md:table-cell">
-                      {k.scope}
-                    </TableCell>
-                    <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
-                      {k.lastUsed}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "text-[10px]",
-                          k.status === "active"
-                            ? "border-success/20 bg-success/10 text-success"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        {k.status}
-                      </Badge>
-                    </TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Key</TableHead>
+                    <TableHead className="hidden md:table-cell">Scope</TableHead>
+                    <TableHead className="hidden sm:table-cell">Last used</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {apiKeys.map((k) => (
+                    <TableRow key={k.id}>
+                      <TableCell className="font-medium">{k.label}</TableCell>
+                      <TableCell className="font-mono text-xs">{k.maskedKey}</TableCell>
+                      <TableCell className="hidden font-mono text-xs text-muted-foreground md:table-cell">
+                        {k.scope}
+                      </TableCell>
+                      <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
+                        {k.lastUsed}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[10px]",
+                            k.status === "active"
+                              ? "border-success/20 bg-success/10 text-success"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          {k.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </Panel>
         </div>
 
         <div className="space-y-5">
-          <Panel icon={theme === "dark" ? Moon : Sun} title="Appearance" subtitle="Theme preference">
+          <Panel
+            icon={theme === "dark" ? Moon : Sun}
+            title="Appearance"
+            subtitle="Theme preference"
+          >
             <div className="flex items-center justify-between rounded-lg bg-surface-2 p-3">
               <div>
                 <p className="text-sm font-medium">Dark mode</p>
-                <p className="text-xs text-muted-foreground">
-                  Currently using the {theme} theme.
-                </p>
+                <p className="text-xs text-muted-foreground">Currently using the {theme} theme.</p>
               </div>
-              <Switch checked={theme === "dark"} onCheckedChange={toggle} aria-label="Toggle dark mode" />
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={toggle}
+                aria-label="Toggle dark mode"
+              />
             </div>
           </Panel>
 
@@ -238,11 +244,7 @@ export default function ProfilePage() {
                     </Label>
                     <p className="mt-0.5 text-xs text-muted-foreground">{p.description}</p>
                   </div>
-                  <Switch
-                    id={p.id}
-                    checked={p.enabled}
-                    onCheckedChange={() => togglePref(p.id)}
-                  />
+                  <Switch id={p.id} checked={p.enabled} onCheckedChange={() => togglePref(p.id)} />
                 </li>
               ))}
             </ul>

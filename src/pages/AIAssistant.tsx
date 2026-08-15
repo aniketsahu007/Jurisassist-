@@ -64,8 +64,8 @@ export default function AIAssistantPage() {
           AI Legal Assistant
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Grounded in the documents on file for {active.caseNumber}. Responses are generated
-          from indexed material and always cite their source.
+          Grounded in the documents on file for {active.caseNumber}. Responses are generated from
+          indexed material and always cite their source.
         </p>
       </header>
 
@@ -80,36 +80,34 @@ export default function AIAssistantPage() {
             </Button>
           </div>
           <div className="h-[560px] space-y-1 overflow-y-auto p-2">
-              {threads.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => select(t.id)}
-                  className={cn(
-                    "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
-                    t.id === activeId ? "bg-secondary" : "hover:bg-surface-2",
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <MessageSquare
-                      className={cn(
-                        "h-3.5 w-3.5 shrink-0",
-                        t.id === activeId ? "text-primary" : "text-muted-foreground",
-                      )}
-                    />
-                    <p className="truncate text-sm font-medium">{t.title}</p>
-                  </div>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">{t.preview}</p>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {t.caseNumber}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {fmtDay(t.updatedAt)}
-                    </span>
-                  </div>
-                </button>
-              ))}
+            {threads.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => select(t.id)}
+                className={cn(
+                  "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
+                  t.id === activeId ? "bg-secondary" : "hover:bg-surface-2",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <MessageSquare
+                    className={cn(
+                      "h-3.5 w-3.5 shrink-0",
+                      t.id === activeId ? "text-primary" : "text-muted-foreground",
+                    )}
+                  />
+                  <p className="truncate text-sm font-medium">{t.title}</p>
+                </div>
+                <p className="mt-1 truncate text-xs text-muted-foreground">{t.preview}</p>
+                <div className="mt-1.5 flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {t.caseNumber}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">{fmtDay(t.updatedAt)}</span>
+                </div>
+              </button>
+            ))}
           </div>
         </aside>
 
@@ -118,9 +116,7 @@ export default function AIAssistantPage() {
           <div className="flex items-center justify-between border-b px-4 py-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{active.title}</p>
-              <p className="font-mono text-[11px] text-muted-foreground">
-                {active.caseNumber}
-              </p>
+              <p className="font-mono text-[11px] text-muted-foreground">{active.caseNumber}</p>
             </div>
             <Badge variant="outline" className="gap-1.5">
               <Sparkle className="h-3 w-3 text-primary" />
@@ -217,9 +213,7 @@ export default function AIAssistantPage() {
                         style={{ animationDelay: `${i * 140}ms` }}
                       />
                     ))}
-                    <span className="text-xs text-muted-foreground">
-                      Reading the record…
-                    </span>
+                    <span className="text-xs text-muted-foreground">Reading the record…</span>
                   </div>
                 </div>
               )}
@@ -308,8 +302,8 @@ export default function AIAssistantPage() {
               </div>
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Generated analysis is a drafting aid and must be verified against the original
-              record before filing.
+              Generated analysis is a drafting aid and must be verified against the original record
+              before filing.
             </p>
           </div>
         </section>

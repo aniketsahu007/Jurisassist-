@@ -19,8 +19,6 @@ export function useProfile() {
     billing,
     prefs,
     togglePref: (id: string) =>
-      setPrefs((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)),
-      ),
+      setPrefs((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p))),
   };
 }

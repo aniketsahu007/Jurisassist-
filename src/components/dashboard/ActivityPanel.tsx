@@ -22,13 +22,7 @@ function timeAgo(iso: string) {
   return `${Math.round(hrs / 24)}d ago`;
 }
 
-export function ActivityPanel({
-  items,
-  loading,
-}: {
-  items: ActivityItem[];
-  loading: boolean;
-}) {
+export function ActivityPanel({ items, loading }: { items: ActivityItem[]; loading: boolean }) {
   return (
     <div className="panel p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -137,9 +131,7 @@ export function NotificationsPanel({
                 />
                 <div className="min-w-0">
                   <p className="text-sm font-medium">{n.title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                    {n.detail}
-                  </p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{n.detail}</p>
                 </div>
               </div>
             </li>

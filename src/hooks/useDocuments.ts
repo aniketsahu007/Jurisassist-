@@ -1,17 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { documentsApi } from "@/lib/api";
+import { documentsApi, type ApiDocument } from "@/lib/api";
 
 /**
  * Data access layer — wired to the FastAPI backend.
- * Mock data files in src/data/ are kept as TypeScript type references.
+ *
+ * Hooks return flattened shapes so page components can destructure
+ * without digging into React Query internals.
  */
 
-export function useRecentUploads(caseId: string | undefined) {
-  return useQuery({
-    queryKey: ["documents", caseId],
+export function useRecentUploads(caseId?: string | undefined) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["documents", caseId ?? "__all"],
     queryFn: () => documentsApi.list(caseId!, { limit: 20 }),
     enabled: !!caseId,
   });
+
+  const items: ApiDocument[] = data?.items ?? [];
+  return { items, loading: isLoading };
 }
 
 export function useDocument(docId: string | undefined) {

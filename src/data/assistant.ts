@@ -1,11 +1,6 @@
 export type ChatRole = "user" | "assistant";
 
-export type QuickActionId =
-  | "summarize"
-  | "contradictions"
-  | "draft"
-  | "similar"
-  | "timeline";
+export type QuickActionId = "summarize" | "contradictions" | "draft" | "similar" | "timeline";
 
 export interface Citation {
   id: string;
@@ -211,7 +206,7 @@ export const conversations: Conversation[] = [
         role: "assistant",
         at: "2026-07-31T08:59:00Z",
         content:
-          "The settled position is that where a member is found fit at entry, any subsequent disability is presumed to be attributable to or aggravated by service, and the burden lies on the department to rebut it with reasoned medical opinion. The Release Medical Board here records only the words \"constitutional disorder\" without reasons, which is precisely the defect the courts have repeatedly held to be insufficient.",
+          'The settled position is that where a member is found fit at entry, any subsequent disability is presumed to be attributable to or aggravated by service, and the burden lies on the department to rebut it with reasoned medical opinion. The Release Medical Board here records only the words "constitutional disorder" without reasons, which is precisely the defect the courts have repeatedly held to be insufficient.',
       },
     ],
   },
@@ -229,7 +224,7 @@ const responseByAction: Record<QuickActionId, MockResponse> = {
   },
   contradictions: {
     content:
-      "I found **three material contradictions** in the record:\n\n1. **Seizure count.** The panchanama dated 18 August 2023 lists two external drives; the FSL forwarding memo dated 22 August 2023 records three sealed exhibits.\n2. **Time of arrest.** The arrest memo records 07:15 hrs, while PW-6 (independent pancha) deposed in cross-examination that he reached the premises \"a little after nine in the morning\".\n3. **Deed custody.** PW-3 stated the originals never left the sub-registrar's strong room, yet Exhibit P-9 is a certified copy issued on an application signed by the complainant three days earlier.\n\nContradictions 1 and 3 go to the integrity of the exhibits and are worth pressing; contradiction 2 is likely to be explained as an approximation.",
+      'I found **three material contradictions** in the record:\n\n1. **Seizure count.** The panchanama dated 18 August 2023 lists two external drives; the FSL forwarding memo dated 22 August 2023 records three sealed exhibits.\n2. **Time of arrest.** The arrest memo records 07:15 hrs, while PW-6 (independent pancha) deposed in cross-examination that he reached the premises "a little after nine in the morning".\n3. **Deed custody.** PW-3 stated the originals never left the sub-registrar\'s strong room, yet Exhibit P-9 is a certified copy issued on an application signed by the complainant three days earlier.\n\nContradictions 1 and 3 go to the integrity of the exhibits and are worth pressing; contradiction 2 is likely to be explained as an approximation.',
     citations: [anvarCitation],
   },
   draft: {

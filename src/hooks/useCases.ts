@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { casesApi, type CreateCasePayload } from "@/lib/api";
+import { casesApi, type CreateCasePayload, type ApiCase } from "@/lib/api";
 
 /**
  * Data access layer — wired to the FastAPI backend.
- * Mock data files in src/data/ are kept as TypeScript type references.
+ *
+ * Returns a flattened shape that page components can destructure directly
+ * without digging into React Query's `data` wrapper.
  */
 
 export interface CaseQuery {
@@ -19,12 +21,17 @@ export interface CaseQuery {
 export function useCases(query: CaseQuery = {}) {
   const { search = "", status = "all", page = 1, pageSize = 6 } = query;
 
-  return useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["cases", { search, status, page, pageSize }],
-    queryFn: () =>
-      casesApi.list({ page, limit: pageSize, status, search: search || undefined }),
-    placeholderData: (prev) => prev, // keep previous data visible while loading next page
+    queryFn: () => casesApi.list({ page, limit: pageSize, status, search: search || undefined }),
+    placeholderData: (prev) => prev,
   });
+
+  const items: ApiCase[] = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+
+  return { items, total, pageCount, loading: isLoading, isError, error };
 }
 
 export function useCaseDetail(caseId: string | undefined) {
@@ -41,7 +48,6 @@ export function useCreateCase() {
   return useMutation({
     mutationFn: (payload: CreateCasePayload) => casesApi.create(payload),
     onSuccess: () => {
-      // Invalidate the cases list so it refetches and shows the new case
       queryClient.invalidateQueries({ queryKey: ["cases"] });
     },
   });
@@ -59,7 +65,6 @@ export function useDeleteCase() {
 }
 
 export function useCaseStats() {
-  // Derived from the full case list with no filters
-  const { data } = useCases({ pageSize: 1 });
-  return { total: data?.total ?? 0 };
+  const { total } = useCases({ pageSize: 1 });
+  return { total };
 }

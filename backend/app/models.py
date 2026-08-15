@@ -43,11 +43,19 @@ class EventType(enum.Enum):
     ORDER = "ORDER"
     JUDGMENT = "JUDGMENT"
 
+class CasePriority(enum.Enum):
+    CRITICAL = "CRITICAL"
+    HIGH = "HIGH"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
+
 class CaseStatus(enum.Enum):
-    OPEN = "OPEN"
-    PENDING_HEARING = "PENDING_HEARING"
-    CLOSED = "CLOSED"
-    ARCHIVED = "ARCHIVED"
+    ACTIVE = "ACTIVE"
+    UNDER_TRIAL = "UNDER_TRIAL"
+    RESERVED_FOR_JUDGMENT = "RESERVED_FOR_JUDGMENT"
+    DISPOSED = "DISPOSED"
+    STAYED = "STAYED"
+    APPEAL_FILED = "APPEAL_FILED"
 
 class CitationStatus(enum.Enum):
     PARTY = "PARTY"
@@ -76,12 +84,19 @@ class Case(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     
     title = Column(String, nullable=False)
+    case_number = Column(String, nullable=True)  # Display number, e.g. "CRL.A. 482/2024"
     client_name = Column(String)
     court_name = Column(String)
     judge_name = Column(String)
     fir_number = Column(String)
     case_type = Column(String)
-    status = Column(Enum(CaseStatus), default=CaseStatus.OPEN, nullable=False)
+    status = Column(Enum(CaseStatus), default=CaseStatus.ACTIVE, nullable=False)
+    priority = Column(Enum(CasePriority), default=CasePriority.MEDIUM, nullable=False)
+    
+    summary = Column(Text, nullable=True)
+    lead_counsel = Column(String, nullable=True)
+    statutes = Column(JSON, nullable=True, default=list)  # e.g. ["IPC §420", "BNS §318"]
+    filed_on = Column(DateTime(timezone=True), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
