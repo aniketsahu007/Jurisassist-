@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ProfilePage from "@/pages/Profile";
 
-const title = "Profile — Lexora";
+const title = "Profile — jurisAssist";
 const description =
-  "Advocate and firm profile, appearance and notification preferences, API keys and billing overview for the Lexora workspace.";
+  "Advocate and firm profile, appearance and notification preferences, API keys and billing overview for the jurisAssist workspace.";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({

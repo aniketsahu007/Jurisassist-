@@ -162,7 +162,7 @@ export const caseTimeline: TimelineEvent[] = [
       officer: "Sr. Adv. Kavita Menon leading Adv. Meera Kulkarni",
       documents: ["Written submissions (draft v4)", "Compilation of judgments"],
       notes:
-        "Lexora AI has flagged three coordinate-bench rulings on retrospectivity of BNS §318 for inclusion in the compilation.",
+        "jurisAssist AI has flagged three coordinate-bench rulings on retrospectivity of BNS §318 for inclusion in the compilation.",
     },
   },
   {

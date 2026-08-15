@@ -1,0 +1,44 @@
+{
+  "documents": [
+    {
+      "filename": "state_v_sharma_fir_001.pdf",
+      "type": "FIR",
+      "ground_truth": {
+        "summary": "This is a First Information Report filed against Rahul Sharma for alleged offenses under sections 302 and 34 of the IPC, relating to an incident on Oct 14, 2023.",
+        "entities": [
+          {
+            "type": "ACCUSED",
+            "value": "Rahul Sharma"
+          },
+          {
+            "type": "STATUTE",
+            "statute_framework": "IPC",
+            "value": "Section 302"
+          },
+          {
+            "type": "STATUTE",
+            "statute_framework": "IPC",
+            "value": "Section 34"
+          },
+          {
+            "type": "LOCATION",
+            "value": "Connaught Place, New Delhi"
+          }
+        ],
+        "timeline_events": [
+          {
+            "date": "2023-10-14T22:30:00Z",
+            "type": "INCIDENT",
+            "description": "Alleged incident occurred at the Connaught Place intersection."
+          },
+          {
+            "date": "2023-10-15T09:00:00Z",
+            "type": "FILING",
+            "description": "FIR filed at the local police station."
+          }
+        ]
+      }
+    }
+    // Add the remaining 19 golden set documents here...
+  ]
+}

@@ -7,9 +7,9 @@ const description =
 export const Route = createFileRoute("/timeline")({
   head: () => ({
     meta: [
-      { title: "Case Timeline — Lexora" },
+      { title: "Case Timeline — jurisAssist" },
       { name: "description", content: description },
-      { property: "og:title", content: "Case Timeline — Lexora" },
+      { property: "og:title", content: "Case Timeline — jurisAssist" },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

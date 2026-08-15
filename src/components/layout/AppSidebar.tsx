@@ -93,7 +93,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-display text-base leading-none font-semibold">Lexora</p>
+              <p className="font-display text-base leading-none font-semibold">jurisAssist</p>
               <p className="mt-1 truncate text-[11px] text-muted-foreground">
                 Legal Intelligence
               </p>

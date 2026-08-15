@@ -124,7 +124,7 @@ export default function AIAssistantPage() {
             </div>
             <Badge variant="outline" className="gap-1.5">
               <Sparkle className="h-3 w-3 text-primary" />
-              Lexora Engine v3.2
+              jurisAssist Engine v3.2
             </Badge>
           </div>
 

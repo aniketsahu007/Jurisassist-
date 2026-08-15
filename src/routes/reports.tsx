@@ -7,9 +7,9 @@ const description =
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "AI Case Report — Lexora" },
+      { title: "AI Case Report — jurisAssist" },
       { name: "description", content: description },
-      { property: "og:title", content: "AI Case Report — Lexora" },
+      { property: "og:title", content: "AI Case Report — jurisAssist" },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

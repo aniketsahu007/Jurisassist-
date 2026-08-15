@@ -26,7 +26,7 @@ export const activityFeed: ActivityItem[] = [
   {
     id: "a-1",
     kind: "ai",
-    actor: "Lexora AI",
+    actor: "jurisAssist AI",
     action: "generated a precedent brief for",
     target: "State of Maharashtra v. Rohan Deshmukh",
     caseNumber: "CRL.A. 482/2024",
@@ -71,7 +71,7 @@ export const activityFeed: ActivityItem[] = [
   {
     id: "a-6",
     kind: "ai",
-    actor: "Lexora AI",
+    actor: "jurisAssist AI",
     action: "flagged a conflicting authority in",
     target: "Nandini Iyer v. Union of India",
     caseNumber: "W.P. (C) 9042/2025",

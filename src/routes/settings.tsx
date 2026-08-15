@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import SettingsPage from "@/pages/Settings";
 
-const title = "Settings — Lexora";
+const title = "Settings — jurisAssist";
 const description =
   "General workspace preferences, security controls and integration placeholders for WhatsApp, Indian Kanoon, OpenAI, Claude, ChromaDB, Redis, PostgreSQL and FastAPI.";
 

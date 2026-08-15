@@ -11,14 +11,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("lexora-theme") as Theme | null;
+    const stored = window.localStorage.getItem("jurisassist-theme") as Theme | null;
     if (stored === "light" || stored === "dark") setTheme(stored);
   }, []);
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem("lexora-theme", theme);
+    window.localStorage.setItem("jurisassist-theme", theme);
   }, [theme]);
 
   return (

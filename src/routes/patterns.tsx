@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import PatternAnalysisPage from "@/pages/PatternAnalysis";
 
-const title = "Pattern Analysis — Lexora";
+const title = "Pattern Analysis — jurisAssist";
 const description =
   "Litigation analytics: judge preferences, success-rate trends, rejected arguments, section outcomes and a judge-by-argument receptivity heatmap.";
 

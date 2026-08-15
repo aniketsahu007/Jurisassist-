@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import AIMemoryPage from "@/pages/AIMemory";
 
-const title = "AI Memory — Lexora";
+const title = "AI Memory — jurisAssist";
 const description =
   "Institutional legal memory: past cases, previous strategies, successful arguments, frequently used sections, saved notes and similarity-scored vector search.";
 

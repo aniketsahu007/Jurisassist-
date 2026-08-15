@@ -84,7 +84,7 @@ export const caseReport: CaseReport = {
   caseTitle: "State of Maharashtra v. Rohan Deshmukh",
   court: "Bombay High Court",
   generatedAt: "2026-08-05T04:10:00Z",
-  model: "Lexora Analysis Engine v3.2",
+  model: "jurisAssist Analysis Engine v3.2",
   pagesAnalysed: 1_284,
   documentsAnalysed: 47,
   confidence: 82,

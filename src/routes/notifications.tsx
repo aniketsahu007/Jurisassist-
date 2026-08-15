@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import NotificationsPage from "@/pages/Notifications";
 
-const title = "Notifications — Lexora";
+const title = "Notifications — jurisAssist";
 const description =
   "Hearing reminders, filing deadlines, similar judgment alerts, document processing and AI report updates in one notification centre.";
 

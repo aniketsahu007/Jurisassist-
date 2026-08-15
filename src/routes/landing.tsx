@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LandingPage from "@/pages/Landing";
 
-const title = "Lexora — AI Legal Intelligence for Indian Chambers";
+const title = "jurisAssist — AI Legal Intelligence for Indian Chambers";
 const description =
-  "Lexora reads chargesheets, builds case chronologies, finds precedent and drafts submissions so counsel can spend the morning arguing, not assembling the brief.";
+  "jurisAssist reads chargesheets, builds case chronologies, finds precedent and drafts submissions so counsel can spend the morning arguing, not assembling the brief.";
 
 export const Route = createFileRoute("/landing")({
   head: () => ({

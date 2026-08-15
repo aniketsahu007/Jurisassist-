@@ -5,8 +5,6 @@ import {
   createRootRouteWithContext,
   useRouter,
   useRouterState,
-  HeadContent,
-  Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -79,17 +77,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lexora — AI Legal Intelligence Platform" },
+      { title: "jurisAssist — AI Legal Intelligence Platform" },
       {
         name: "description",
         content:
-          "Lexora is an AI-powered legal intelligence workspace for case management, hearings and precedent research.",
+          "jurisAssist is an AI-powered legal intelligence workspace for case management, hearings and precedent research.",
       },
-      { property: "og:title", content: "Lexora — AI Legal Intelligence Platform" },
+      { property: "og:title", content: "jurisAssist — AI Legal Intelligence Platform" },
       {
         property: "og:description",
         content:
-          "Lexora is an AI-powered legal intelligence workspace for case management, hearings and precedent research.",
+          "jurisAssist is an AI-powered legal intelligence workspace for case management, hearings and precedent research.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -105,25 +103,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en" className="dark">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();

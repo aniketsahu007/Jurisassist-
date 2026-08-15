@@ -7,9 +7,9 @@ const description =
 export const Route = createFileRoute("/documents/")({
   head: () => ({
     meta: [
-      { title: "Document Upload — Lexora" },
+      { title: "Document Upload — jurisAssist" },
       { name: "description", content: description },
-      { property: "og:title", content: "Document Upload — Lexora" },
+      { property: "og:title", content: "Document Upload — jurisAssist" },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

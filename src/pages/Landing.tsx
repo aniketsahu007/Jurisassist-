@@ -127,7 +127,7 @@ const faqs = [
     a: "Reported judgments of the Supreme Court, all High Courts and major tribunals, alongside your own uploaded records and orders.",
   },
   {
-    q: "Can Lexora draft filings?",
+    q: "Can jurisAssist draft filings?",
     a: "It produces first drafts of bail applications, written submissions and rejoinders with citations attached. Every draft is reviewed by counsel before filing.",
   },
   {
@@ -164,7 +164,7 @@ export default function LandingPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Scale className="h-4 w-4" />
           </div>
-          <span className="font-display text-lg font-semibold">Lexora</span>
+          <span className="font-display text-lg font-semibold">jurisAssist</span>
           <nav className="ml-8 hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             <a href="#features" className="transition-colors hover:text-foreground">Features</a>
             <a href="#capabilities" className="transition-colors hover:text-foreground">AI</a>
@@ -195,7 +195,7 @@ export default function LandingPage() {
               Legal intelligence for chambers that argue at pace
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Lexora reads your chargesheets, builds the chronology, finds the precedent and drafts
+              jurisAssist reads your chargesheets, builds the chronology, finds the precedent and drafts
               the submission — so counsel spends the morning arguing, not assembling the brief.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -366,14 +366,14 @@ export default function LandingPage() {
           <div>
             <p className="text-eyebrow">Contact</p>
             <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">
-              Talk to the Lexora team
+              Talk to the jurisAssist team
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
               Walkthroughs run for 40 minutes with your own matter as the worked example.
             </p>
             <ul className="mt-6 space-y-3 text-sm">
               <li className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-primary" /> chambers@lexora.legal
+                <Mail className="h-4 w-4 text-primary" /> chambers@jurisassist.legal
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-primary" /> +91 22 6811 4400
@@ -410,7 +410,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Scale className="h-4 w-4" />
-            <span>Lexora Legal Intelligence · Mumbai</span>
+            <span>jurisAssist Legal Intelligence · Mumbai</span>
           </div>
           <p>Demonstration build with illustrative data. Not legal advice.</p>
         </div>

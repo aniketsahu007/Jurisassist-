@@ -337,7 +337,7 @@ export const documentRecord: DocumentRecord = {
       text: "editable template files corresponding to the impugned deeds, last modified on 12 May 2021",
       page: 3,
       tone: "issue",
-      by: "Lexora AI",
+      by: "jurisAssist AI",
     },
     {
       id: "h-3",
@@ -371,7 +371,7 @@ export const documentRecord: DocumentRecord = {
     },
     {
       id: "an-3",
-      author: "Lexora AI",
+      author: "jurisAssist AI",
       page: 5,
       createdAt: "2026-08-01T07:05:00Z",
       body: "BNS §318 is invoked for conduct predating 01 July 2024 on pages 1 and 5 — potential retrospectivity objection.",
