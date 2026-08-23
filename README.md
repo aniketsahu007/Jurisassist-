@@ -1,4 +1,4 @@
-# LexMind AI Launchpad
+# JurisAssist
 
 Create a premium interactive 3D landing + login page for an AI-powered legal-tech platform called LexMind AI.
 
