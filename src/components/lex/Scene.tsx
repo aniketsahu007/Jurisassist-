@@ -212,7 +212,9 @@ export function Scene({ compact = false }: { compact?: boolean }) {
         <DocCard title="FIR" meta="Sec. 420 · IPC" className="left-[2%] top-[8%]" depth={110} tilt={16} />
         <DocCard title="JUDGMENT" meta="SC · 2019" className="right-[2%] top-[18%]" depth={130} tilt={-18} />
         <DocCard title="CHARGESHEET" meta="Dist. Court" className="right-[6%] bottom-[10%]" depth={80} tilt={-12} />
-        <DocCard title="CASE FILE" meta="Linked · 12 docs" className="left-[6%] bottom-[6%]" depth={95} tilt={14} />
+        {!compact && (
+          <DocCard title="CASE FILE" meta="Linked · 12 docs" className="left-[6%] bottom-[6%]" depth={95} tilt={14} />
+        )}
 
         {/* floating labels */}
         {labels.map((l) => (
