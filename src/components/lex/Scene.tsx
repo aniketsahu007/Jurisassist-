@@ -72,14 +72,14 @@ export function Scene({ compact = false }: { compact?: boolean }) {
   return (
     <div
       ref={ref}
-      className={`relative mx-auto w-full ${compact ? "h-[420px] max-w-xl" : "h-[560px] max-w-4xl"}`}
+      className={`relative mx-auto w-full ${compact ? "h-[520px] max-w-2xl" : "h-[560px] max-w-4xl"}`}
       style={{ perspective: "1400px" }}
       aria-hidden
     >
       <div
         className="absolute inset-0 scene-3d transition-transform duration-300 ease-out"
         style={{
-          transform: `rotateX(${-pos.y * 8}deg) rotateY(${pos.x * 12}deg) translate3d(${pos.x * -14}px, ${pos.y * -10}px, 0)`,
+          transform: `rotateX(${-pos.y * 8}deg) rotateY(${pos.x * 12}deg) translate3d(${pos.x * -14}px, ${pos.y * -10}px, 0) scale(${compact ? 0.82 : 1})`,
         }}
       >
         {/* connective intelligence lines */}
