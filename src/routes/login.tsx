@@ -7,13 +7,13 @@ import { Scene } from "@/components/lex/Scene";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Login — LexMind AI Legal Intelligence Workspace" },
+      { title: "Login — JurisAssist AI Legal Intelligence Workspace" },
       {
         name: "description",
         content:
-          "Sign in to JurisAssist by LexMind AI and continue your legal intelligence workspace for case files, timelines and research.",
+          "Sign in to JurisAssist and continue your legal intelligence workspace for case files, timelines and research.",
       },
-      { property: "og:title", content: "Login — LexMind AI" },
+      { property: "og:title", content: "Login — JurisAssist AI" },
       {
         property: "og:description",
         content: "Continue your legal intelligence workspace.",

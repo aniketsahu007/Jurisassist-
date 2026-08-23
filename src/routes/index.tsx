@@ -6,13 +6,13 @@ import { Scene } from "@/components/lex/Scene";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "LexMind AI — Legal Case Intelligence for Lawyers" },
+      { title: "JurisAssist — Legal Case Intelligence for Lawyers" },
       {
         name: "description",
         content:
-          "LexMind AI turns FIRs, chargesheets and judgments into structured case intelligence with OCR, timelines and similar-case research for Indian law.",
+          "JurisAssist turns FIRs, chargesheets and judgments into structured case intelligence with OCR, timelines and similar-case research for Indian law.",
       },
-      { property: "og:title", content: "LexMind AI — Legal Case Intelligence" },
+      { property: "og:title", content: "JurisAssist — Legal Case Intelligence" },
       {
         property: "og:description",
         content:
@@ -57,7 +57,7 @@ function Landing() {
       <section className="relative mx-auto max-w-6xl px-6 pb-10 pt-8 text-center">
         <span className="animate-rise inline-flex items-center gap-2 rounded-full glass-chip px-4 py-1.5 text-[11px] font-medium tracking-[0.18em] text-primary-glow">
           <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent)]" />
-          LEXMIND AI · LEGAL INTELLIGENCE ENGINE
+          JURISASSIST · LEGAL INTELLIGENCE ENGINE
         </span>
 
         <h1
@@ -108,7 +108,9 @@ function Landing() {
               key={c.tag}
               className="group rounded-2xl glass-panel p-5 transition-all duration-500 hover:-translate-y-1.5 hover:border-primary/40"
             >
-              <p className="text-[10px] font-semibold tracking-[0.2em] text-primary-glow">{c.tag}</p>
+              <p className="text-[10px] font-semibold tracking-[0.2em] text-primary-glow">
+                {c.tag}
+              </p>
               <h2 className="mt-3 font-display text-lg font-semibold tracking-tight">{c.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.body}</p>
               <span className="mt-4 block h-px w-0 bg-gradient-to-r from-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -135,8 +137,18 @@ function Landing() {
 
       <footer className="relative border-t border-glass-border/60 px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row">
-          <span>© 2026 LexMind AI · JurisAssist</span>
-          <span className="tracking-[0.2em]">PRIVACY · TERMS · SECURITY</span>
+          <span>© 2026 JurisAssist</span>
+          <nav aria-label="Legal" className="flex items-center gap-4 tracking-[0.16em]">
+            <Link to="/privacy" className="transition-colors hover:text-primary-glow">
+              PRIVACY
+            </Link>
+            <Link to="/terms" className="transition-colors hover:text-primary-glow">
+              TERMS
+            </Link>
+            <Link to="/security" className="transition-colors hover:text-primary-glow">
+              SECURITY
+            </Link>
+          </nav>
         </div>
       </footer>
     </main>

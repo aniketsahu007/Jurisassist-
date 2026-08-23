@@ -1,123 +1,154 @@
 # JurisAssist
 
-Create a premium interactive 3D landing + login page for an AI-powered legal-tech platform called LexMind AI.
+### AI-Powered Legal Case Intelligence Platform
 
-The platform helps lawyers manage large numbers of legal documents such as FIRs, chargesheets, judgments, and case files. AI extracts information using OCR/NLP, automatically organizes case history, builds timelines, finds potentially similar cases from Indian legal sources, and helps lawyers identify patterns across their previous cases.
+JurisAssist is an AI-powered legal-tech platform designed to help lawyers manage, organize, and research complex case information.
 
-HERO / LANDING PAGE
+Lawyers often deal with large numbers of FIRs, chargesheets, judgments, and other legal documents. JurisAssist aims to reduce the manual effort involved in organizing these documents, understanding case history, finding potentially relevant cases, and identifying patterns across previous cases.
 
-Use a dark, premium legal-tech + AI aesthetic with black/navy backgrounds, glassmorphism, subtle blue/cyan highlights, elegant typography, and cinematic 3D elements.
+## 🚀 Current Progress
 
-Hero headline:
+This repository currently contains the **frontend landing page and authentication UI**.
 
-"Turn Legal Complexity Into Intelligence."
+### Implemented
 
-Subtitle:
+* Premium 3D landing page
+* Interactive 3D legal-tech visualizations
+* JurisAssist branding
+* Responsive UI
+* Login page
+* Signup UI
+* Glassmorphism-based interface
+* Interactive animations and hover effects
+* Frontend-only authentication placeholders
 
-"AI-powered case management, legal research, and case intelligence — built for lawyers."
+### Planned
 
-Buttons:
+The following features will be integrated by the team:
 
-Get Started →
-Login →
+* User authentication
+* Legal document upload
+* OCR for scanned documents
+* Case information extraction
+* Automatic case timeline generation
+* Similar-case retrieval
+* Indian legal case research
+* RAG-based legal research assistant
+* Case pattern detection
+* Lawyer-specific case memory
+* AI-generated case summaries
+* Backend and database integration
+* WhatsApp integration
 
-3D VISUAL
+## 🛠️ Tech Stack
 
-Make the centerpiece an interactive 3D digital legal case file floating in space.
+### Frontend
 
-Surround it with:
+* React
+* TypeScript
+* Tailwind CSS
+* Vite
+* 3D/animation libraries used by the project
 
-FIR documents
+### Planned Backend
 
-Judgment documents
+* Python
+* FastAPI
+* PostgreSQL
+* Redis
+* Vector database
+* OCR/NLP pipeline
+* LLM + RAG
 
-Court building silhouette
+## 💻 Running the Project Locally
 
-Legal scales
+### Prerequisites
 
-AI neural-network nodes
+Make sure you have:
 
-Connected case files
+* Node.js
+* npm
+* Git
 
-A glowing case timeline
+### Clone the repository
 
-Connect these elements with subtle animated lines to represent:
+```bash
+git clone <repository-url>
+cd cortex-legal-orb
+```
 
-Documents → AI → Legal Intelligence
+### Install dependencies
 
-Add small floating labels such as:
+```bash
+npm install
+```
 
-OCR ANALYSIS
-CASE TIMELINE
-SIMILAR CASES
-AI RESEARCH
-PATTERN DETECTION
+### Start the development server
 
-The 3D scene should respond subtly to mouse movement with parallax, rotation, lighting, and hover effects.
-
-LOGIN PAGE
-
-Create a beautiful glassmorphism login card integrated into the same 3D environment.
-
-Logo:
-
-JurisAssist
-
-Heading:
-
-"Welcome back."
-
-Subtitle:
-
-"Continue your legal intelligence workspace."
-
-Fields:
-
-Email
-Password
-
-Links:
-
-Forgot Password?
-
-Buttons:
-
-Login →
-Continue with Google
-
-Below:
-
-Don't have an account? Create one
-
-STYLE
-
-Make it look like a real premium AI startup, not a college project.
-
-Think:
-
-AI + Legal Technology + 3D + Professional + Minimal + Futuristic
-
-Use smooth animations, cinematic lighting, subtle particles, glass cards, depth, and polished micro-interactions.
-
-Keep the page clean and fast. Do not create dashboards or backend functionality — this page will later be connected to the rest of the application by other team members.
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/53fe8d7d-4b66-4140-983e-1cc4a0d72ece).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
 npm run dev
 ```
+
+The terminal will provide a local URL, usually:
+
+```text
+http://localhost:5173
+```
+
+Open that URL in your browser.
+
+## 📁 Project Structure
+
+The main frontend code is located inside:
+
+```text
+src/
+```
+
+Other important directories/files include:
+
+```text
+public/          → Images and static assets
+src/components/ → Reusable UI components
+src/             → Main application code
+package.json     → Project dependencies and scripts
+```
+
+## 🔐 Environment Variables
+
+If environment variables are required in the future, create a local `.env` file.
+
+**Do not commit API keys, passwords, database credentials, or other secrets to GitHub.**
+
+Use `.env.example` to document required variables without exposing their values.
+
+## 🤝 Team Development
+
+This repository is the shared source of truth for the JurisAssist project.
+
+Before starting work:
+
+```bash
+git pull
+```
+
+After making changes:
+
+```bash
+git add .
+git commit -m "Describe your changes"
+git push
+```
+
+Coordinate with the team before making major structural changes.
+
+## ⚠️ Disclaimer
+
+JurisAssist is intended to provide **AI-assisted legal research and case-management support**. It is not intended to replace qualified legal professionals or provide guaranteed legal conclusions.
+
+---
+
+### JurisAssist
+
+**Turn Legal Complexity Into Intelligence.**
+

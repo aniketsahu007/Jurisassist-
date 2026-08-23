@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LexMind AI — Legal Case Intelligence" },
+      { title: "JurisAssist — Legal Case Intelligence" },
       {
         name: "description",
         content: "AI-powered case management, legal research and case intelligence for lawyers.",
       },
-      { name: "author", content: "LexMind AI" },
-      { property: "og:title", content: "LexMind AI — Legal Case Intelligence" },
+      { name: "author", content: "JurisAssist" },
+      { property: "og:title", content: "JurisAssist — Legal Case Intelligence" },
       {
         property: "og:description",
         content: "AI-powered case management, legal research and case intelligence for lawyers.",
