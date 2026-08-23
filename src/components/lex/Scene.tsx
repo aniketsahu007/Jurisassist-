@@ -1,7 +1,7 @@
 import { useParallax } from "./useParallax";
 
 const labels = [
-  { text: "OCR ANALYSIS", x: "4%", y: "16%", depth: 90 },
+  { text: "OCR ANALYSIS", x: "26%", y: "2%", depth: 90 },
   { text: "CASE TIMELINE", x: "68%", y: "8%", depth: 130 },
   { text: "SIMILAR CASES", x: "74%", y: "62%", depth: 110 },
   { text: "AI RESEARCH", x: "2%", y: "68%", depth: 150 },
