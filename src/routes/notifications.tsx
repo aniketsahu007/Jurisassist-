@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import NotificationsPage from "@/pages/Notifications";
+import NotificationsPage from "@/features/notifications/NotificationsPage";
 
 const title = "Notifications — jurisAssist";
 const description =

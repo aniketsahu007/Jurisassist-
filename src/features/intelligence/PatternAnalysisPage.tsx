@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip as UiTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { usePatterns } from "@/hooks/usePatterns";
+import { usePatterns } from "./usePatterns";
 
 function useMounted() {
   const [m, setM] = useState(false);

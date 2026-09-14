@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ProfilePage from "@/pages/Profile";
+import ProfilePage from "@/features/settings/ProfilePage";
 
 const title = "Profile — jurisAssist";
 const description =

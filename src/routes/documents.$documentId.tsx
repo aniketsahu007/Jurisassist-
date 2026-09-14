@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import DocumentViewerPage from "@/pages/DocumentViewer";
+import DocumentViewerPage from "@/features/documents/DocumentViewerPage";
 
 const description =
   "Read paginated case documents alongside extracted sections, timeline, metadata, entities, highlights and annotations.";

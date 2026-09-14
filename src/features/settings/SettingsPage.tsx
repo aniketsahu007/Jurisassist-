@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSettings } from "@/hooks/useSettings";
+import { useSettings } from "./useSettings";
 import { cn } from "@/lib/utils";
 
 const statusTone: Record<string, string> = {

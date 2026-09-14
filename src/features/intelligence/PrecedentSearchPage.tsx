@@ -19,7 +19,7 @@ import {
   precedentTypes,
   precedentYears,
 } from "@/data/precedents";
-import { usePrecedentSearch, useSavedPrecedents } from "@/hooks/usePrecedents";
+import { usePrecedentSearch, useSavedPrecedents } from "./usePrecedents";
 
 function Filter({
   label,

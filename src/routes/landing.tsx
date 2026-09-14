@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import LandingPage from "@/pages/Landing";
+import LandingPage from "@/features/landing/LandingPage";
 
 const title = "jurisAssist — AI Legal Intelligence for Indian Chambers";
 const description =

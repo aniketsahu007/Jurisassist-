@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AIMemoryPage from "@/pages/AIMemory";
+import AIMemoryPage from "@/features/intelligence/AIMemoryPage";
 
 const title = "AI Memory — jurisAssist";
 const description =

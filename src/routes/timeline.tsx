@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import CaseTimelinePage from "@/pages/CaseTimeline";
+import CaseTimelinePage from "@/features/timeline/CaseTimelinePage";
 
 const description =
   "Interactive vertical case chronology from incident and FIR through arrest, chargesheet, hearings and judgment.";

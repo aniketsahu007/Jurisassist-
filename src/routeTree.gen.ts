@@ -20,7 +20,9 @@ import { Route as PrecedentsRouteImport } from './routes/precedents'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as DocumentsIndexRouteImport } from './routes/documents.index'
 import { Route as DocumentsDocumentIdRouteImport } from './routes/documents.$documentId'
 
@@ -79,9 +81,19 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocumentsIndexRoute = DocumentsIndexRouteImport.update({
@@ -107,7 +119,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/documents/': typeof DocumentsIndexRoute
 }
@@ -123,7 +137,9 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/documents': typeof DocumentsIndexRoute
 }
@@ -140,7 +156,9 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/documents/': typeof DocumentsIndexRoute
 }
@@ -158,7 +176,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sign-up'
     | '/timeline'
+    | '/auth/callback'
     | '/documents/$documentId'
     | '/documents/'
   fileRoutesByTo: FileRoutesByTo
@@ -174,7 +194,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sign-up'
     | '/timeline'
+    | '/auth/callback'
     | '/documents/$documentId'
     | '/documents'
   id:
@@ -190,7 +212,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sign-up'
     | '/timeline'
+    | '/auth/callback'
     | '/documents/$documentId'
     | '/documents/'
   fileRoutesById: FileRoutesById
@@ -207,7 +231,9 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
+  SignUpRoute: typeof SignUpRoute
   TimelineRoute: typeof TimelineRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   DocumentsDocumentIdRoute: typeof DocumentsDocumentIdRoute
   DocumentsIndexRoute: typeof DocumentsIndexRoute
 }
@@ -291,11 +317,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/timeline': {
       id: '/timeline'
       path: '/timeline'
       fullPath: '/timeline'
       preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/documents/': {
@@ -327,7 +367,9 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
+  SignUpRoute: SignUpRoute,
   TimelineRoute: TimelineRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   DocumentsDocumentIdRoute: DocumentsDocumentIdRoute,
   DocumentsIndexRoute: DocumentsIndexRoute,
 }

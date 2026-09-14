@@ -1,17 +1,37 @@
-import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Sun, Search, UserCircle } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Bell, Moon, Sun, Search, LogOut } from "lucide-react";
+import { useAuth } from "@/features/auth/AuthProvider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "@/lib/theme";
-import { useNotifications } from "@/hooks/useDashboard";
+import { useNotifications } from "@/features/dashboard/useDashboard";
 import { cn } from "@/lib/utils";
 
 export function Topbar() {
   const { theme, toggle } = useTheme();
   const { items, unread } = useNotifications();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const displayName = (user?.user_metadata?.full_name as string) ?? user?.email ?? "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
+
+  async function handleSignOut() {
+    await signOut();
+    navigate({ to: "/sign-up" });
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-3 backdrop-blur-md sm:px-5">
@@ -75,11 +95,40 @@ export function Topbar() {
         </Button>
 
         <div className="ml-2 flex items-center border-l pl-2">
-          <Button variant="ghost" size="icon" asChild aria-label="Profile">
-            <Link to="/profile">
-              <UserCircle className="h-5 w-5" />
-            </Link>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border bg-muted text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="User menu"
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+                ) : (
+                  initials
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel className="font-normal">
+                <p className="text-sm font-medium leading-none">{displayName}</p>
+                {user?.email && (
+                  <p className="mt-1 text-xs text-muted-foreground">{user.email}</p>
+                )}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/profile" className="cursor-pointer">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

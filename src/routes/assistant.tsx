@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AIAssistantPage from "@/pages/AIAssistant";
+import AIAssistantPage from "@/features/assistant/AIAssistantPage";
 
 const description =
   "Chat with jurisAssist's legal assistant over the indexed case record — summaries, contradictions, drafts, precedents and extracted timelines with citations.";

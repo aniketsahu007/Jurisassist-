@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useNotificationCenter } from "@/hooks/useNotificationCenter";
+import { useNotificationCenter } from "./useNotificationCenter";
 import type { NotificationType } from "@/data/notifications";
 
 const typeMeta: Record<NotificationType, { icon: typeof Bell; tone: string; dot: string }> = {

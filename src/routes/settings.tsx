@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import SettingsPage from "@/pages/Settings";
+import SettingsPage from "@/features/settings/SettingsPage";
 
 const title = "Settings — jurisAssist";
 const description =

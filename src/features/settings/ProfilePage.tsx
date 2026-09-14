@@ -26,7 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "./useProfile";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 

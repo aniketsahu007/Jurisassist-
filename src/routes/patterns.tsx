@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import PatternAnalysisPage from "@/pages/PatternAnalysis";
+import PatternAnalysisPage from "@/features/intelligence/PatternAnalysisPage";
 
 const title = "Pattern Analysis — jurisAssist";
 const description =

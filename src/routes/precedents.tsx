@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import PrecedentSearchPage from "@/pages/PrecedentSearch";
+import PrecedentSearchPage from "@/features/intelligence/PrecedentSearchPage";
 
 const title = "Precedent Search — jurisAssist";
 const description =

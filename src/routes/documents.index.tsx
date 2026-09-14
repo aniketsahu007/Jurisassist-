@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import DocumentUploadPage from "@/pages/DocumentUpload";
+import DocumentUploadPage from "@/features/documents/DocumentUploadPage";
 
 const description =
   "Drag and drop pleadings, exhibits, hearing recordings and site footage for OCR, entity extraction and timeline detection.";

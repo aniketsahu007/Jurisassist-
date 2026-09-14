@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useCaseTimeline } from "@/hooks/useTimeline";
+import { useCaseTimeline } from "./useTimeline";
 import type { TimelineEvent, TimelineStage, TimelineStatus } from "@/data/timeline";
 
 const stageIcon: Record<TimelineStage, typeof Gavel> = {

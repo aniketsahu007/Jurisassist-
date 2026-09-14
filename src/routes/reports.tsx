@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AIReportPage from "@/pages/AIReport";
+import AIReportPage from "@/features/intelligence/AIReportPage";
 
 const description =
   "AI-generated case report: executive summary, chronology, key facts, legal issues, missing evidence, contradictions, precedents, drafts, risk analysis and confidence score.";

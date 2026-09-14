@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useMemoryBank, useVectorSearch } from "@/hooks/useMemoryBank";
+import { useMemoryBank, useVectorSearch } from "./useMemoryBank";
 
 function Panel({
   icon: Icon,

@@ -1,6 +1,6 @@
 import { CalendarPlus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboard } from "@/hooks/useDashboard";
+import { useDashboard } from "./useDashboard";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { CasesByStatusChart, HearingsChart } from "@/components/dashboard/Charts";
 import { ActivityPanel, NotificationsPanel } from "@/components/dashboard/ActivityPanel";

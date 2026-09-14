@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useAssistant } from "@/hooks/useAssistant";
+import { useAssistant } from "./useAssistant";
 import { quickActions, suggestedPrompts, type QuickActionId } from "@/data/assistant";
 import { MarkdownText } from "@/components/assistant/MarkdownText";
 

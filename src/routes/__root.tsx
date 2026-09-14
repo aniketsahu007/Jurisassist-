@@ -112,7 +112,8 @@ function RootComponent() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
   // Public pages that don't need the app shell layout
-  const isPublicPage = pathname === "/landing";
+  const publicPaths = ["/landing", "/sign-up", "/auth/callback"];
+  const isPublicPage = publicPaths.some((p) => pathname.startsWith(p));
 
   return (
     <ThemeProvider>

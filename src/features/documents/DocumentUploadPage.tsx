@@ -25,8 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useRecentUploads, useUploadDocument } from "@/hooks/useDocuments";
-import { useCases } from "@/hooks/useCases";
+import { useRecentUploads, useUploadDocument } from "./useDocuments";
+import { useCases } from "@/features/cases/useCases";
 import {
   acceptedFormats,
   kindFromFileName,

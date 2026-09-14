@@ -18,7 +18,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useCases, useCreateCase } from "@/hooks/useCases";
+import { useCases, useCreateCase } from "./useCases";
 import { CaseCard, CaseCardSkeleton } from "@/components/cases/CaseCard";
 import { EmptyState } from "@/components/dashboard/ActivityPanel";
 
