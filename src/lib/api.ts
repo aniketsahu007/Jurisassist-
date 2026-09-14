@@ -4,6 +4,8 @@
  * Swap BASE_URL via VITE_API_URL env var for production deployments.
  */
 
+import { supabase } from "./supabase";
+
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export function getApiBaseUrl() {
@@ -11,8 +13,13 @@ export function getApiBaseUrl() {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // Attach the Supabase session JWT so the FastAPI backend can verify the caller
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+
   const headers: HeadersInit = {
     "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 

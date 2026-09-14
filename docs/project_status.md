@@ -1,41 +1,88 @@
-# jurisAssist - Project Status
+# jurisAssist — Project Status
 
-## What we have completed so far
+_Last updated: 14 September 2026_
 
-### 1. Project Cleanup & Rebranding
+---
 
-- **Vite SPA Migration:** Successfully converted the frontend from a complex Server-Side Rendering (SSR) framework to a standard, lightweight Vite React Single Page Application (SPA) so it runs purely on the frontend as requested.
-- **Rebranding:** Globally renamed the project from "Lexora" to **jurisAssist**.
+## Completed
 
-### 2. Phase 1: Architecture, Contracts & Evaluation Framework
+### Phase 0 — Rebranding & Framework Migration ✅
+- Renamed project from "Lexora" → **jurisAssist**
+- Migrated from SSR (TanStack Start) to a pure Vite React SPA
+- Set up TanStack Router (file-based), TanStack Query, Tailwind CSS v4, shadcn/ui
 
-We successfully laid the technical foundation for the entire application, moving from mockups to a production-ready blueprint.
+### Phase 1 — Architecture & Contracts ✅
+- PostgreSQL schema (8 tables: users, cases, documents, chunks, entities, timeline_events, precedent_results, correction_logs) — `backend/app/models.py`
+- Pydantic API schemas — `backend/app/schemas.py`
+- Architecture documented — `docs/architecture.md`
+- Alembic migrations applied to Supabase
+- AI evaluation framework scaffolded — `backend/eval/ground_truth.json`
 
-- **Part 1.1 - Data Modeling:** We designed a robust PostgreSQL database schema to support cases, documents, entities, timeline events, and precedent results. _Status: Executed in `backend/app/models.py` using SQLAlchemy._
-- **Part 1.2 - API Contracts:** We defined strict API boundaries between the React frontend and the FastAPI backend, utilizing presigned URLs for large document uploads and strict pagination. _Status: Executed in `backend/app/schemas.py` using Pydantic._
-- **Part 1.3 - Architecture Blueprint:** We mapped out the data flows involving FastAPI, Celery, Postgres, and ChromaDB. _Status: Documented in `docs/architecture.md`._
-- **Part 1.4 & 1.5 - AI Evaluation Framework:** We defined strict accuracy metrics (e.g., 90% recall for extraction) and created a testing format. _Status: Scaffolded in `backend/eval/ground_truth.json`._
+### Phase 2 — Core Platform (Non-AI) ✅
+- FastAPI + SQLAlchemy connected to Supabase PostgreSQL
+- Case CRUD API (`/api/v1/cases`) with ownership, pagination, search
+- Document upload: presigned URL two-step flow (files go directly to Supabase Storage, never touch API server)
+- Frontend hooks (`useCases`, `useDocuments`) wired to live FastAPI via TanStack Query
 
-### 3. Phase 2: Core Platform (Non-AI Foundation)
+### Phase 2.5 — Authentication Migration ✅  _(completed today)_
+> Previously used **Clerk** — migrated to **Supabase Auth + Google OAuth**
 
-We successfully built and **fully wired** the non-AI infrastructure end-to-end.
+- `src/lib/supabase.ts` — Supabase browser client singleton
+- `src/features/auth/AuthProvider.tsx` — session context, `signInWithGoogle()`, `signOut()`
+- `src/features/auth/SignUpPage.tsx` — Google OAuth sign-in UI
+- `src/routes/sign-up.tsx` — public route, `beforeLoad` redirects if already authenticated
+- `src/routes/auth.callback.tsx` — PKCE code exchange after Google consent
+- `src/components/layout/AppShell.tsx` — auth guard, redirects unauthenticated users to `/sign-up`
+- `src/components/layout/Topbar.tsx` — shows real user avatar + name from Google; sign-out dropdown
 
-- **Part 2.1 - FastAPI & Supabase Infrastructure Setup:** Configured FastAPI, SQLAlchemy, and Alembic to connect to a Supabase PostgreSQL instance (`backend/app/main.py`, `backend/app/database.py`).
-- **Part 2.2 - Authentication (Clerk):** Integrated Clerk authentication with **real JWT verification** using JWKS public keys. Created `get_current_user` dependency in FastAPI that verifies RS256-signed tokens and a webhook endpoint (with Svix signature verification) to sync Clerk users with our Postgres `users` table (`backend/app/auth.py`, `backend/app/routers/webhooks.py`).
-- **Part 2.3 - Case Management APIs:** Implemented full CRUD for cases (`/api/v1/cases`), enforcing strict ownership constraints, pagination, and search. Case model supports all rich fields: case_number, priority, summary, lead_counsel, statutes, filed_on, documents_count (`backend/app/routers/cases.py`).
-- **Part 2.4 - Document Upload Infrastructure:** Implemented a two-step direct-to-S3 (Supabase Storage) upload flow using presigned URLs to keep large PDFs off the API server (`backend/app/storage.py`, `backend/app/routers/documents.py`).
-- **Part 2.5 - Database Migrations:** Set up Alembic with autogenerate support. Initial migration creates all 8 tables (users, cases, documents, document_chunks, extracted_entities, timeline_events, precedent_results, correction_logs) with proper indexes and foreign keys. _Applied to Supabase._
-- **Part 2.6 - Frontend Integration:** Rewrote `src/hooks/useCases.ts` and `src/hooks/useDocuments.ts` using `@tanstack/react-query` to hit the live FastAPI backend. Hooks return **flattened shapes** that page components can destructure directly. Updated `CaseCard.tsx` to accept `ApiCase` type. Wired the "New case" dialog in `Cases.tsx` to the create mutation. Wired `DocumentUpload.tsx` to use real upload mutation with case selection. Frontend app wrapped in `<ClerkProvider>` + `<QueryClientProvider>`.
+### Phase 2.6 — Folder Restructure ✅  _(completed today)_
+Dissolved the flat `src/pages/` and `src/hooks/` directories into a **feature-slice architecture**:
 
-Phase 1 and Phase 2 are 100% complete and **fully wired end-to-end** in the codebase.
+```
+src/features/
+├── auth/           AuthProvider, SignUpPage
+├── assistant/      AIAssistantPage, useAssistant
+├── cases/          CasesPage, useCases
+├── dashboard/      DashboardPage, useDashboard
+├── documents/      DocumentUploadPage, DocumentViewerPage, useDocuments
+├── intelligence/   AIMemoryPage, AIReportPage, PatternAnalysisPage,
+│                   PrecedentSearchPage, useMemoryBank, usePatterns,
+│                   usePrecedents, useReport
+├── landing/        LandingPage
+├── notifications/  NotificationsPage, useNotificationCenter
+├── settings/       ProfilePage, SettingsPage, useProfile, useSettings
+└── timeline/       CaseTimelinePage, useTimeline
+```
 
-### What remains on mock data (expected — future phases)
+`src/lib/` now holds only pure utilities: `api.ts`, `supabase.ts`, `theme.tsx`, `utils.ts`, `use-mobile.tsx`  
+Build: ✅ 0 errors, 2646 modules
 
-The following features still use hardcoded mock data via `src/data/` files, as specified in the implementation roadmap:
+---
 
-- Dashboard metrics & charts (`useDashboard.ts`) — Phase 4+
-- Case timeline (`useTimeline.ts`) — Phase 4
-- Precedent search (`usePrecedents.ts`) — Phase 5
-- AI Assistant chat (`useAssistant.ts`) — Phase 7
-- Memory bank / patterns (`useMemoryBank.ts`, `usePatterns.ts`) — Phase 8
-- Profile, Settings, Notifications, Reports — future phases
+## Pending (requires manual action from you)
+
+> [!IMPORTANT]
+> Auth won't work until you do these 3 things:
+> 1. **Google Cloud Console** → Create OAuth 2.0 Client ID → add redirect URI: `https://mfogdggfobjrmljkplbl.supabase.co/auth/v1/callback`
+> 2. **Supabase Dashboard** → Authentication → Providers → Google → paste Client ID + Secret → Enable; set Site URL to `http://localhost:5173`
+> 3. **`.env`** → replace `PASTE_YOUR_ANON_KEY_HERE` with your real Supabase anon key (Project Settings → API)
+
+---
+
+## Still on mock data (expected — future phases)
+
+| Feature | Hook | Phase |
+|---|---|---|
+| Dashboard metrics & charts | `useDashboard.ts` | 4 |
+| Case timeline | `useTimeline.ts` | 4 |
+| Precedent search | `usePrecedents.ts` | 5 |
+| AI Assistant | `useAssistant.ts` | 7 |
+| Memory bank | `useMemoryBank.ts` | 8 |
+| Pattern analysis | `usePatterns.ts` | 8 |
+| Profile, Settings, Notifications, Reports | — | future |
+
+---
+
+## What's Next
+
+See the **Next Steps** section below.
