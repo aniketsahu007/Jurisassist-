@@ -167,3 +167,78 @@ def delete_case(
     case.deleted_at = datetime.utcnow()
     db.commit()
     return  # 204 No Content
+
+
+@router.get("/{case_id}/timeline")
+def get_case_timeline(
+    case_id: str,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user),
+):
+    """Get the chronologically sorted timeline for a specific case."""
+    case = db.query(Case).filter(
+        Case.id == case_id,
+        Case.user_id == current_user_id,
+        Case.deleted_at.is_(None),
+    ).first()
+
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    events = db.query(TimelineEvent).filter(
+        TimelineEvent.case_id == case_id
+    ).order_by(TimelineEvent.event_date.asc()).all()
+
+    formatted_events = []
+    for ev in events:
+        stage_mapping = {
+            EventType.INCIDENT: "Incident",
+            EventType.ARREST: "Arrest",
+            EventType.FILING: "FIR Registered",
+            EventType.HEARING: "Hearing",
+            EventType.ORDER: "Hearing",
+            EventType.JUDGMENT: "Judgment"
+        }
+        
+        now = datetime.utcnow()
+        if ev.event_date.date() < now.date():
+            status = "completed"
+        elif ev.event_date.date() == now.date():
+            status = "current"
+        else:
+            status = "upcoming"
+
+        # Smart dynamic headline generation based on description context
+        desc_lower = ev.description.lower()
+        dynamic_title = ev.event_type.name.replace("_", " ").title()
+        
+        if "extortion" in desc_lower: dynamic_title = "Extortion Allegations"
+        elif "police service" in desc_lower: dynamic_title = "Police Service Record"
+        elif "written complaint" in desc_lower: dynamic_title = "Written Complaint Filed"
+        elif "fir" in desc_lower: dynamic_title = "FIR Registration"
+        elif "arrest" in desc_lower: dynamic_title = "Arrest Executed"
+        elif "bail" in desc_lower: dynamic_title = "Bail Proceedings"
+        elif "charge sheet" in desc_lower: dynamic_title = "Charge Sheet Filed"
+        elif "judgment" in desc_lower: dynamic_title = "Final Judgment"
+        else:
+            words = ev.description.split()
+            if len(words) > 4 and ev.event_type.name == "INCIDENT":
+                first_few = " ".join(words[:4]).strip(".,;:!'\"")
+                dynamic_title = first_few.title() + "..."
+
+        formatted_events.append({
+            "id": ev.id,
+            "date": ev.event_date.isoformat(),
+            "stage": stage_mapping.get(ev.event_type, "Incident"),
+            "status": status,
+            "title": dynamic_title,
+            "description": ev.description,
+            "details": {
+                "location": "Not specified",
+                "officer": "Unknown",
+                "notes": ev.description,
+                "documents": []
+            }
+        })
+
+    return {"events": formatted_events}

@@ -21,11 +21,13 @@ def create_signed_upload_url(doc_id: str, filename: str) -> tuple[str, str]:
     # Path in the bucket: <doc_id>/<original_filename>
     file_path = f"{doc_id}/{filename}"
     result = client.storage.from_(STORAGE_BUCKET).create_signed_upload_url(file_path)
-    return result["signedUrl"], file_path
+    signed_url = result.get("signed_url") or result.get("signedUrl")
+    return signed_url, file_path
 
 
 def create_signed_download_url(file_path: str, expires_in: int = 3600) -> str:
     """Generate a short-lived signed URL for reading a file (1 hour default)."""
     client = get_supabase()
     result = client.storage.from_(STORAGE_BUCKET).create_signed_url(file_path, expires_in)
-    return result["signedUrl"]
+    signed_url = result.get("signed_url") or result.get("signedUrl")
+    return signed_url

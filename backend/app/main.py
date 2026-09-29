@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-from .routers import cases, documents
+from .routers import cases, documents, search
 
 # Load env variables
 load_dotenv()
@@ -41,3 +41,4 @@ def health_check():
 
 app.include_router(cases.router)
 app.include_router(documents.router)
+app.include_router(search.router)

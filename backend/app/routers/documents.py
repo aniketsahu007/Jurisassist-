@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional
@@ -15,6 +15,7 @@ from ..schemas import (
     PaginatedDocumentResponse,
 )
 from ..storage import create_signed_upload_url, create_signed_download_url
+from ..tasks import process_document_task
 
 router = APIRouter(tags=["Documents"])
 
@@ -100,6 +101,7 @@ def initiate_upload(
 @router.post("/api/v1/documents/{doc_id}/confirm", status_code=202)
 def confirm_upload(
     doc_id: str,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
@@ -113,8 +115,7 @@ def confirm_upload(
     doc.status = DocumentStatus.PROCESSING_OCR
     db.commit()
 
-    # TODO Phase 3: Trigger Celery task here
-    # process_document.delay(doc_id)
+    background_tasks.add_task(process_document_task, doc_id)
 
     return {"status": "queued", "doc_id": doc_id}
 
@@ -168,6 +169,7 @@ def get_document_status(
 @router.post("/api/v1/documents/{doc_id}/retry", status_code=202)
 def retry_document(
     doc_id: str,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
@@ -180,8 +182,7 @@ def retry_document(
     doc.status = DocumentStatus.PROCESSING_OCR
     db.commit()
 
-    # TODO Phase 3: Re-trigger Celery task
-    # process_document.delay(doc_id)
+    background_tasks.add_task(process_document_task, doc_id)
 
     return {"status": "retrying", "doc_id": doc_id}
 
