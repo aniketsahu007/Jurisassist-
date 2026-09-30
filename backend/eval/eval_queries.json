@@ -1,0 +1,177 @@
+[
+  {
+    "query": "admissibility of electronic records without certificate",
+    "expected_docids": ["1838048", "182329819", "187283766"], 
+    "notes": "Verified: Anvar P.V vs P.K.Basheer (2014)"
+  },
+  {
+    "query": "Section 65B mandatory requirement certificate from device custodian",
+    "expected_docids": ["73196426", "172105947"], 
+    "notes": "Verified: Arjun Panditrao Khotkar vs Kailash Kushanrao (2020)"
+  },
+  {
+    "query": "bail in economic offences prolonged detention",
+    "expected_docids": ["1544666", "1563495"], 
+    "notes": "Verified: Sanjay Chandra vs CBI (2011)"
+  },
+  {
+    "query": "Section 438 CrPC anticipatory bail factors",
+    "expected_docids": ["360699", "1108032"], 
+    "notes": "Verified: Siddharam Satlingappa Mhetre vs State of Maharashtra (2010)"
+  },
+  {
+    "query": "quashing of FIR under Section 482 CrPC abuse of process",
+    "expected_docids": ["1025815", "1033637"], 
+    "notes": "Verified: State of Haryana vs Bhajan Lal (1992)"
+  },
+  {
+    "query": "Article 21 guidelines for arrest and detention rights of arrestee",
+    "expected_docids": ["501097"], 
+    "notes": "Verified: D.K. Basu vs State of W.B (1996)"
+  },
+  {
+    "query": "Section 45 PMLA twin conditions for bail constitutionality",
+    "expected_docids": ["135081273"], 
+    "notes": "Verified: Vijay Madanlal Choudhary vs Union Of India (2022)"
+  },
+  {
+    "query": "Section 498A IPC arbitrary arrest guidelines notice of appearance",
+    "expected_docids": ["2975331"], 
+    "notes": "Verified: Arnesh Kumar vs State of Bihar (2014)"
+  },
+  {
+    "query": "Section 154 CrPC mandatory registration of FIR cognizable offence",
+    "expected_docids": ["164283832"], 
+    "notes": "Verified: Lalita Kumari vs Govt.Of U.P.& Ors (2013)"
+  },
+  {
+    "query": "Section 66A Information Technology Act unconstitutional free speech",
+    "expected_docids": ["110813550"], 
+    "notes": "Verified: Shreya Singhal vs U.O.I (2015)"
+  },
+  {
+    "query": "decriminalization of homosexuality Section 377 IPC",
+    "expected_docids": ["168671544"], 
+    "notes": "Verified: Navtej Singh Johar vs Union Of India (2018)"
+  },
+  {
+    "query": "right to privacy fundamental right Article 21",
+    "expected_docids": ["127517806"], 
+    "notes": "Verified: K.S. Puttaswamy vs Union Of India (2017)"
+  },
+  {
+    "query": "basic structure doctrine parliament amending power Article 368",
+    "expected_docids": ["257876"], 
+    "notes": "Verified: Kesavananda Bharati vs State of Kerala (1973)"
+  },
+  {
+    "query": "reservation ceiling 50 percent creamy layer exclusion",
+    "expected_docids": ["1363234"], 
+    "notes": "Verified: Indra Sawhney vs Union Of India (1992)"
+  },
+  {
+    "query": "Section 125 CrPC maintenance to muslim divorced wife",
+    "expected_docids": ["1031309"], 
+    "notes": "Verified: Mohd. Ahmed Khan vs Shah Bano Begum (1985)"
+  },
+  {
+    "query": "triple talaq unconstitutional arbitrary",
+    "expected_docids": [], 
+    "notes": "Unverified: Shayara Bano vs Union Of India (2017)"
+  },
+  {
+    "query": "death penalty rarest of rare doctrine",
+    "expected_docids": [], 
+    "notes": "Unverified: Bachan Singh vs State of Punjab (1980)"
+  },
+  {
+    "query": "Section 304B IPC dowry death presumption soon before death",
+    "expected_docids": [], 
+    "notes": "Unverified: Satvir Singh vs State of Punjab (2001)"
+  },
+  {
+    "query": "Article 19(1)(g) right to internet access restrictions",
+    "expected_docids": [], 
+    "notes": "Unverified: Anuradha Bhasin vs Union of India (2020)"
+  },
+  {
+    "query": "Section 138 NI Act presumptions blank cheque",
+    "expected_docids": [], 
+    "notes": "Unverified: Bir Singh vs Mukesh Kumar (2019)"
+  },
+  {
+    "query": "adverse possession 12 years requirement peaceful continuous",
+    "expected_docids": [], 
+    "notes": "Unverified: Ravinder Kaur Grewal vs Manjit Kaur (2019)"
+  },
+  {
+    "query": "medical negligence bolam test standard of care",
+    "expected_docids": [], 
+    "notes": "Unverified: Jacob Mathew vs State of Punjab (2005)"
+  },
+  {
+    "query": "Section 167(2) CrPC default bail statutory right",
+    "expected_docids": [], 
+    "notes": "Unverified: Uday Mohanlal Acharya vs State of Maharashtra (2001)"
+  },
+  {
+    "query": "specific performance readiness and willingness Section 16(c)",
+    "expected_docids": [], 
+    "notes": "Unverified: Syed Dastagir vs T.R. Gopalakrishna Setty (1999)"
+  },
+  {
+    "query": "Section 300 Exception 4 sudden fight sudden provocation",
+    "expected_docids": [], 
+    "notes": "Unverified: Surinder Kumar vs UT, Chandigarh (1989)"
+  },
+  {
+    "query": "copyright infringement substantial similarity test",
+    "expected_docids": [], 
+    "notes": "Unverified: R.G. Anand vs Delux Films (1978)"
+  },
+  {
+    "query": "Section 319 CrPC power to summon additional accused standard",
+    "expected_docids": [], 
+    "notes": "Unverified: Hardeep Singh vs State of Punjab (2014)"
+  },
+  {
+    "query": "arbitration section 11 independence and impartiality of arbitrator",
+    "expected_docids": [], 
+    "notes": "Unverified: TRF Ltd vs Energo Engineering (2017)"
+  },
+  {
+    "query": "Section 34 common intention active participation",
+    "expected_docids": [], 
+    "notes": "Unverified: Barendra Kumar Ghosh vs King Emperor (1925)"
+  },
+  {
+    "query": "public interest litigation locus standi relaxation",
+    "expected_docids": [], 
+    "notes": "Unverified: S.P. Gupta vs Union of India (1981)"
+  },
+  {
+    "query": "Section 14 limitation act exclusion of time proceeding in wrong court",
+    "expected_docids": [], 
+    "notes": "Unverified: Consolidated Engineering vs Principal Secretary (2008)"
+  },
+  {
+    "query": "dying declaration alone basis of conviction uncorroborated",
+    "expected_docids": [], 
+    "notes": "Unverified: Khushal Rao vs State of Bombay (1958)"
+  },
+  {
+    "query": "Article 14 arbitrary state action reasonableness",
+    "expected_docids": [], 
+    "notes": "Unverified: E.P. Royappa vs State of Tamil Nadu (1974)"
+  },
+  {
+    "query": "writ of mandamus private body public function",
+    "expected_docids": [], 
+    "notes": "Unverified: Andi Mukta Sadguru vs V.R. Rudani (1989)"
+  },
+  {
+    "query": "Hindu Succession Act 2005 amendment retrospective coparcenary daughter",
+    "expected_docids": [], 
+    "notes": "Unverified: Vineeta Sharma vs Rakesh Sharma (2020)"
+  }
+]

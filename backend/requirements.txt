@@ -20,3 +20,4 @@ onnxruntime
 langchain-text-splitters==0.3.5
 protobuf>=5.29,<6
 googleapis-common-protos>=1.65,<1.67
+pycryptodome==3.23.0

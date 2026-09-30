@@ -1,58 +1,82 @@
-import { useEffect, useMemo, useState } from "react";
-import { precedents, type PrecedentResult } from "@/data/precedents";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { precedentsApi, casesApi } from "@/lib/api";
 
-/** Future integration point: swap for a FastAPI-backed precedent search. */
 export interface PrecedentQuery {
   search?: string;
-  court?: string;
-  judge?: string;
-  year?: string;
-  section?: string;
-  caseType?: string;
+  caseId?: string;
 }
 
-export function usePrecedentSearch(query: PrecedentQuery = {}) {
-  const [loading, setLoading] = useState(true);
-  const {
-    search = "",
-    court = "all",
-    judge = "all",
-    year = "all",
-    section = "all",
-    caseType = "all",
-  } = query;
+export function usePrecedentSearch(queryObj: PrecedentQuery = {}) {
+  const { search = "", caseId } = queryObj;
 
-  useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => setLoading(false), 420);
-    return () => clearTimeout(t);
-  }, [search, court, judge, year, section, caseType]);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["precedents", search, caseId],
+    queryFn: () => precedentsApi.search(search, 10, caseId),
+    enabled: !!search.trim(),
+  });
 
-  const results: PrecedentResult[] = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return precedents
-      .filter((p) => {
-        const haystack = [p.title, p.citation, p.summary, p.judge, p.court, ...p.sections]
-          .join(" ")
-          .toLowerCase();
-        return (
-          (!q || haystack.includes(q)) &&
-          (court === "all" || p.court === court) &&
-          (judge === "all" || p.judge === judge) &&
-          (year === "all" || String(p.year) === year) &&
-          (section === "all" || p.sections.includes(section)) &&
-          (caseType === "all" || p.caseType === caseType)
-        );
-      })
-      .sort((a, b) => b.relevance - a.relevance);
-  }, [search, court, judge, year, section, caseType]);
+  const results = (data?.results || []).map((r) => ({
+    id: r.docid,
+    title: r.title.replace(/<[^>]*>?/gm, ''), // strip HTML from title
+    summary: r.headline.replace(/<[^>]*>?/gm, ''), // used as fallback until lazy loaded AI summary
+    court: r.court || "Unknown Court",
+    outcome: r.citationStatus || "Unknown",
+    relevance: Math.round(r.vectorSim * 100) || 0,
+    date: r.date || "",
+  }));
 
   return { results, total: results.length, loading };
 }
 
-export function useSavedPrecedents() {
-  const [saved, setSaved] = useState<string[]>([]);
-  const toggle = (id: string) =>
-    setSaved((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  return { saved, toggle };
+export function usePrecedentSummary(docid: string, query: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["precedent-summary", docid, query],
+    queryFn: () => precedentsApi.generateSummary(docid, query),
+    enabled: enabled && !!docid && !!query.trim(),
+    staleTime: Infinity,
+  });
+}
+
+export function useSavedPrecedents(caseId?: string) {
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
+    queryKey: ["saved-precedents", caseId],
+    queryFn: () => casesApi.getPrecedents(caseId!),
+    enabled: !!caseId,
+  });
+
+  const savedIds = (data?.items || []).map((item: any) => item.precedentId);
+
+  const saveMutation = useMutation({
+    mutationFn: (payload: any) => casesApi.savePrecedent(caseId!, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["saved-precedents", caseId] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (precId: string) => casesApi.deletePrecedent(caseId!, precId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["saved-precedents", caseId] }),
+  });
+
+  const toggle = (p: any) => {
+    if (!caseId) {
+      alert("Please select a case to save precedents.");
+      return;
+    }
+    if (savedIds.includes(p.id)) {
+      deleteMutation.mutate(p.id);
+    } else {
+      saveMutation.mutate({
+        precedentId: p.id,
+        sourceJudgmentUrl: `https://indiankanoon.org/doc/${p.id}/`,
+        sourceTitle: p.title,
+        courtName: p.court,
+        aiSummary: p.summary,
+        relevanceScore: p.relevance,
+        citationStatus: p.outcome || "Unknown",
+      });
+    }
+  };
+
+  return { saved: savedIds, toggle };
 }

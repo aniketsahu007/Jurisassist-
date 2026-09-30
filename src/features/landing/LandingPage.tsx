@@ -206,10 +206,10 @@ export default function LandingPage() {
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link to="/">Sign in</Link>
+              <Link to="/sign-up">Sign in</Link>
             </Button>
             <Button asChild>
-              <Link to="/">
+              <Link to="/sign-up">
                 Open workspace <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -233,7 +233,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" asChild>
-                <Link to="/">
+                <Link to="/sign-up">
                   Open the workspace <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -368,7 +368,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Button className="mt-6 w-full" variant={p.highlight ? "default" : "outline"} asChild>
-                <Link to="/">Start with {p.name}</Link>
+                <Link to="/sign-up">Start with {p.name}</Link>
               </Button>
             </div>
           ))}
@@ -424,7 +424,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild>
-                <Link to="/">
+                <Link to="/sign-up">
                   Open workspace <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

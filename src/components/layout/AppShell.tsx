@@ -12,7 +12,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loading && !session) {
-      navigate({ to: "/sign-up" });
+      navigate({ to: "/landing" });
     }
   }, [loading, session, navigate]);
 

@@ -106,6 +106,10 @@ export const casesApi = {
   create: (payload: CreateCasePayload) =>
     request<ApiCase>("/api/v1/cases", { method: "POST", body: JSON.stringify(payload) }),
   delete: (id: string) => request<void>(`/api/v1/cases/${id}`, { method: "DELETE" }),
+  getTimeline: (id: string) => request<any>(`/api/v1/cases/${id}/timeline`),
+  getPrecedents: (id: string) => request<any>(`/api/v1/cases/${id}/precedents`),
+  savePrecedent: (id: string, payload: any) => request<any>(`/api/v1/cases/${id}/precedents`, { method: "POST", body: JSON.stringify(payload) }),
+  deletePrecedent: (id: string, precId: string) => request<void>(`/api/v1/cases/${id}/precedents/${precId}`, { method: "DELETE" }),
 };
 
 // ---- Documents ----
@@ -160,4 +164,38 @@ export const documentsApi = {
     await request<void>(`/api/v1/documents/${docId}/confirm`, { method: "POST" });
     return request<ApiDocument>(`/api/v1/documents/${docId}`);
   },
+};
+
+// ---- Precedents ----
+export interface PrecedentSearchResultItem {
+  docid: string;
+  title: string;
+  headline: string;
+  vectorSim: number;
+  citationStatus?: string;
+  court?: string;
+  date?: string;
+}
+
+export interface PrecedentSearchResponse {
+  query: string;
+  results: PrecedentSearchResultItem[];
+}
+
+export interface PrecedentSummaryResponse {
+  aiSummary: string;
+  provider: string;
+}
+
+export const precedentsApi = {
+  search: (query: string, topK: number = 10, caseId?: string) => 
+    request<PrecedentSearchResponse>("/api/v1/precedents/search", {
+      method: "POST",
+      body: JSON.stringify({ query, top_k: topK, case_id: caseId }),
+    }),
+  generateSummary: (docid: string, query: string) =>
+    request<PrecedentSummaryResponse>("/api/v1/precedents/generate-summary", {
+      method: "POST",
+      body: JSON.stringify({ docid, query }),
+    }),
 };

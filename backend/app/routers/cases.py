@@ -242,3 +242,82 @@ def get_case_timeline(
         })
 
     return {"events": formatted_events}
+
+@router.get("/{case_id}/precedents")
+def get_case_precedents(
+    case_id: str,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user),
+):
+    case = db.query(Case).filter(Case.id == case_id, Case.user_id == current_user_id, Case.deleted_at.is_(None)).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+        
+    precedents = db.query(PrecedentResult).filter(PrecedentResult.case_id == case_id).all()
+    
+    # Needs to match PaginatedPrecedentResponse or return list
+    return {"items": precedents, "total": len(precedents), "page": 1, "limit": max(1, len(precedents))}
+
+from ..schemas import SavePrecedentRequest
+from ..models import PrecedentResult
+from sqlalchemy.exc import IntegrityError
+
+@router.post("/{case_id}/precedents")
+def save_case_precedent(
+    case_id: str,
+    payload: SavePrecedentRequest,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user),
+):
+    case = db.query(Case).filter(Case.id == case_id, Case.user_id == current_user_id, Case.deleted_at.is_(None)).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+        
+    new_prec = PrecedentResult(
+        case_id=case_id,
+        precedent_id=payload.precedent_id,
+        source_judgment_url=payload.source_judgment_url,
+        source_title=payload.source_title,
+        court_name=payload.court_name,
+        ai_summary=payload.ai_summary,
+        relevance_score=payload.relevance_score,
+        citation_status=payload.citation_status,
+        query_context=payload.query_context
+    )
+    
+    try:
+        db.add(new_prec)
+        db.commit()
+        db.refresh(new_prec)
+    except IntegrityError:
+        db.rollback()
+        # Idempotent - if it already exists, just return the existing one
+        new_prec = db.query(PrecedentResult).filter(
+            PrecedentResult.case_id == case_id, 
+            PrecedentResult.precedent_id == payload.precedent_id
+        ).first()
+        
+    return new_prec
+
+@router.delete("/{case_id}/precedents/{prec_id}", status_code=204)
+def delete_case_precedent(
+    case_id: str,
+    prec_id: str,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user),
+):
+    case = db.query(Case).filter(Case.id == case_id, Case.user_id == current_user_id, Case.deleted_at.is_(None)).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+        
+    # Cascade delete is handled by DB if case is deleted, but here we delete a specific precedent
+    prec = db.query(PrecedentResult).filter(PrecedentResult.case_id == case_id, PrecedentResult.id == prec_id).first()
+    if not prec:
+        # Check if it was passed the IK precedent_id instead of the UUID
+        prec = db.query(PrecedentResult).filter(PrecedentResult.case_id == case_id, PrecedentResult.precedent_id == prec_id).first()
+        if not prec:
+            raise HTTPException(status_code=404, detail="Precedent not found")
+            
+    db.delete(prec)
+    db.commit()
+    return

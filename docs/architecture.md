@@ -51,10 +51,11 @@ sequenceDiagram
     par Async Processing
         Celery->>PG: Update Status=PROCESSING_OCR
         Celery->>S3: Download PDF
-        Celery->>Celery: Run OCR & Layout extraction
+        Celery->>Celery: Run OCR (Tesseract / PyMuPDF)
         Celery->>PG: Update Status=PROCESSING_AI & Save ocr_text
-        Celery->>Celery: Run LLM Extraction (Entities, Timeline)
+        Celery->>Celery: Run NLP Extraction (spaCy Entities, Timeline)
         Celery->>PG: Save ExtractedEntities & TimelineEvents
+        Celery->>Celery: Generate Embeddings (Local ONNX) & Save to Chroma
         Celery->>PG: Update Status=COMPLETED
     and Frontend Polling
         loop Every 3 seconds
@@ -80,8 +81,7 @@ sequenceDiagram
 
     Lawyer->>API: POST /cases/{id}/precedents/search "Find similar bail arguments"
     API->>DB: Fetch Case context
-    API->>LLM: Generate search embeddings for query
-    LLM-->>API: Vector [0.1, 0.5, ...]
+    API->>API: Generate search embeddings for query (Local ONNX)
 
     API->>Chroma: KNN Search (limit=5)
     Chroma-->>API: Return top 5 chunk IDs (vector_id)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, Boolean, DateTime, ForeignKey, Text, Enum, JSON, Index, Integer
+from sqlalchemy import Column, String, Float, Boolean, DateTime, ForeignKey, Text, Enum, JSON, Index, Integer, UniqueConstraint
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 import enum
@@ -223,6 +223,7 @@ class PrecedentResult(Base):
     
     id = Column(String, primary_key=True, default=generate_uuid)
     case_id = Column(String, ForeignKey("cases.id", ondelete="CASCADE"), nullable=False)
+    precedent_id = Column(String, nullable=False) # The IK docid
 
     source_judgment_url = Column(String, nullable=False)
     source_title = Column(String, nullable=False)
@@ -242,6 +243,8 @@ class PrecedentResult(Base):
 
     __table_args__ = (
         Index("ix_precedent_results_case_id", "case_id"),
+        Index("ix_precedent_results_precedent_id", "precedent_id"),
+        UniqueConstraint("case_id", "precedent_id", name="uq_case_precedent")
     )
 
 class CorrectionLog(Base):

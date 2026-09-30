@@ -1,6 +1,6 @@
 # jurisAssist — Project Status
 
-_Last updated: 14 September 2026_
+_Last updated: 27 September 2026_
 
 ---
 
@@ -57,15 +57,37 @@ src/features/
 `src/lib/` now holds only pure utilities: `api.ts`, `supabase.ts`, `theme.tsx`, `utils.ts`, `use-mobile.tsx`  
 Build: ✅ 0 errors, 2646 modules
 
+### Phase 3 — Document Processing Pipeline (OCR) ✅
+- Set up document download from Supabase Storage locally
+- Set up background task queue for document processing (`app/tasks.py`)
+- Extracted basic text and confidence scores
+
+### Phase 4 & Phase 5 — AI Intelligence & Vector Ingestion ✅
+- Implemented `EntityExtractor` with spaCy NLP and regex heuristics. Fixed OOM crashes by batching text via `nlp.pipe()`
+- Implemented `TimelineBuilder` for classifying legal events and dates
+- Implemented `DocumentChunker` to intelligently split text along sentence boundaries. Fixed infinite loop edge cases.
+- Set up local ChromaDB vector store with ONNX `all-MiniLM-L6-v2` for highly efficient embeddings
+
 ---
 
-## Pending (requires manual action from you)
+### Phase 5 — Precedent Retrieval (Live Search) ✅
+- Implemented live IndianKanoon pipeline + MiniLM reranker. Functional, pending human evaluation.
 
-> [!IMPORTANT]
-> Auth won't work until you do these 3 things:
-> 1. **Google Cloud Console** → Create OAuth 2.0 Client ID → add redirect URI: `https://mfogdggfobjrmljkplbl.supabase.co/auth/v1/callback`
-> 2. **Supabase Dashboard** → Authentication → Providers → Google → paste Client ID + Secret → Enable; set Site URL to `http://localhost:5173`
-> 3. **`.env`** → replace `PASTE_YOUR_ANON_KEY_HERE` with your real Supabase anon key (Project Settings → API)
+---
+
+### Phase 6 — Grounded Generation (LLM Layer) ✅
+- LLM Provider Fallback Chain (Groq: Llama3 -> Mixtral -> Gemma) implemented in `llm_chain.py`.
+- PII Stripper implemented via spaCy/regex and unit tested.
+- Lazy-loading TanStack queries integrated into UI (`usePrecedents.ts`).
+- Strict code-level grounding check preventing hallucinated citations.
+- Disclaimers ("Verify before citing") and provider attribution active on the frontend.
+- API REST endpoints `POST /search`, `POST /generate-summary`, and `GET/POST/DELETE` for persistence built.
+
+---
+
+## Pending
+
+> Phase 7: Agent Layer (AI Assistant / Orchestration) is the next immediate task.
 
 ---
 
@@ -75,7 +97,6 @@ Build: ✅ 0 errors, 2646 modules
 |---|---|---|
 | Dashboard metrics & charts | `useDashboard.ts` | 4 |
 | Case timeline | `useTimeline.ts` | 4 |
-| Precedent search | `usePrecedents.ts` | 5 |
 | AI Assistant | `useAssistant.ts` | 7 |
 | Memory bank | `useMemoryBank.ts` | 8 |
 | Pattern analysis | `usePatterns.ts` | 8 |
@@ -85,4 +106,5 @@ Build: ✅ 0 errors, 2646 modules
 
 ## What's Next
 
-See the **Next Steps** section below.
+1. Start both the Vite frontend server and FastAPI backend server.
+2. Go to the Precedents Search page in the UI and test the complete pipeline!

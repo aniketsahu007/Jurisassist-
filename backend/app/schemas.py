@@ -128,3 +128,39 @@ class EntityCorrectionRequest(BaseSchema):
 class TimelineCorrectionRequest(BaseSchema):
     new_description: Optional[str] = None
     new_event_date: Optional[datetime] = None
+
+class PrecedentSearchRequest(BaseSchema):
+    query: str
+    case_id: Optional[str] = None
+    top_k: int = 10
+
+class PrecedentSearchResultItem(BaseSchema):
+    docid: str
+    title: str
+    headline: str
+    vector_sim: float
+    citation_status: str
+    court: Optional[str] = None
+    date: Optional[str] = None
+
+class PrecedentSearchResponse(BaseSchema):
+    query: str
+    results: List[PrecedentSearchResultItem]
+    
+class PrecedentSummaryRequest(BaseSchema):
+    docid: str
+    query: str
+    
+class PrecedentSummaryResponse(BaseSchema):
+    ai_summary: str
+    provider: str
+
+class SavePrecedentRequest(BaseSchema):
+    precedent_id: str
+    source_judgment_url: str
+    source_title: str
+    court_name: Optional[str] = None
+    ai_summary: str
+    relevance_score: Optional[float] = None
+    citation_status: CitationStatus
+    query_context: Optional[str] = None

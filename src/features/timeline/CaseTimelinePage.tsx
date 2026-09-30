@@ -15,6 +15,15 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useCaseTimeline } from "./useTimeline";
 import type { TimelineEvent, TimelineStage, TimelineStatus } from "@/data/timeline";
+import { useCases } from "@/features/cases/useCases";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect } from "react";
 
 const stageIcon: Record<TimelineStage, typeof Gavel> = {
   Incident: AlertTriangle,
@@ -57,20 +66,55 @@ function fmtDate(iso: string) {
 }
 
 export default function CaseTimelinePage() {
-  const { events, loading } = useCaseTimeline();
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
+  const { items: cases, loading: casesLoading } = useCases({ pageSize: 100 });
+  const { events, loading } = useCaseTimeline(selectedCaseId || undefined);
   const [open, setOpen] = useState<string | null>("t-9");
+
+  // Auto-select first case
+  useEffect(() => {
+    if (!selectedCaseId && cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [cases, selectedCaseId]);
+
+  const activeCase = cases.find((c) => c.id === selectedCaseId);
 
   return (
     <div className="mx-auto max-w-[1000px] space-y-6">
-      <div>
-        <p className="text-eyebrow">Case timeline</p>
-        <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
-          State of Maharashtra v. Rohan Deshmukh
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          CRL.A. 482/2024 · Bombay High Court · Incident through judgment, reconstructed from the
-          record.
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <p className="text-eyebrow">Case timeline</p>
+          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
+            {activeCase ? activeCase.title : "Select a Case"}
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {activeCase 
+              ? `${activeCase.caseNumber || 'No Number'} · ${activeCase.courtName || 'Unknown Court'} · Incident through judgment, reconstructed from the record.`
+              : "No case selected"}
+          </p>
+        </div>
+        
+        <div className="w-full sm:w-auto min-w-[250px]">
+          <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+            <SelectTrigger className="h-9 text-sm bg-background">
+              <SelectValue placeholder={casesLoading ? "Loading cases…" : "Choose a case"} />
+            </SelectTrigger>
+            <SelectContent>
+              {cases.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.caseNumber ? `${c.caseNumber} — ` : ""}
+                  {c.title}
+                </SelectItem>
+              ))}
+              {cases.length === 0 && !casesLoading && (
+                <SelectItem value="__none" disabled>
+                  No cases found
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -86,6 +130,11 @@ export default function CaseTimelinePage() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="panel h-24 animate-pulse bg-muted/40" />
           ))}
+        </div>
+      ) : events.length === 0 ? (
+        <div className="panel px-5 py-12 text-center">
+          <p className="text-muted-foreground">No timeline events extracted yet.</p>
+          <p className="text-sm text-muted-foreground mt-1">Upload a document with dates or events for AI extraction.</p>
         </div>
       ) : (
         <ol className="relative space-y-4 border-l-2 border-border pl-6 sm:pl-8">
