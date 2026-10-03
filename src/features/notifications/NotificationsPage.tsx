@@ -4,7 +4,7 @@ import {
   CheckCheck,
   FileCheck2,
   Gavel,
-  Sparkles,
+  BrainCircuit,
   TimerReset,
   X,
 } from "lucide-react";
@@ -37,7 +37,7 @@ const typeMeta: Record<NotificationType, { icon: typeof Bell; tone: string; dot:
     dot: "bg-success",
   },
   "AI Report Ready": {
-    icon: Sparkles,
+    icon: BrainCircuit,
     tone: "bg-warning/10 text-warning border-warning/20",
     dot: "bg-warning",
   },

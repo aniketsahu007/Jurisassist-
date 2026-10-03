@@ -1,8 +1,8 @@
-import { ArrowUpRight, TrendingUp, Briefcase, UploadCloud, Gavel, Sparkles } from "lucide-react";
+import { ArrowUpRight, TrendingUp, Briefcase, UploadCloud, Gavel, BrainCircuit } from "lucide-react";
 import type { DashboardMetric } from "@/data/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const icons = [Briefcase, UploadCloud, Gavel, Sparkles];
+const icons = [Briefcase, UploadCloud, Gavel, BrainCircuit];
 
 export function StatCards({ metrics, loading }: { metrics: DashboardMetric[]; loading: boolean }) {
   if (loading) {

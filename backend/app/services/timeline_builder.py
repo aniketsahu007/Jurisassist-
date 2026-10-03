@@ -49,9 +49,8 @@ class TimelineBuilder:
                 continue
                 
             context = date_ent.get("context", "")
-            event_type = self._classify_event(context)
             
-            # Clean up the description
+            # Initial parse
             import re
             clean_context = re.sub(r'\s+', ' ', context).strip()
             
@@ -65,25 +64,51 @@ class TimelineBuilder:
             
             events.append({
                 "event_date": parsed_date,
-                "event_type": event_type,
+                "event_type": self._classify_event(context),
                 "description": description,
                 "confidence": date_ent.get("confidence", 0.7),
                 "is_ai_generated": True,
                 "is_user_corrected": False
             })
             
-        # Sort chronologically
-        events.sort(key=lambda x: x["event_date"])
-        
-        # Deduplicate by day and event type
+        # Deduplicate by day and raw context string
         unique_events = []
         seen = set()
         for ev in events:
             day_str = ev["event_date"].strftime("%Y-%m-%d")
-            key = (day_str, ev["event_type"])
+            key = (day_str, ev["description"])
             if key not in seen:
                 seen.add(key)
                 unique_events.append(ev)
+                
+        # Sort chronologically
+        unique_events.sort(key=lambda x: x["event_date"])
+        
+        # Use LLM to enhance the readability of the timeline
+        if unique_events:
+            try:
+                import asyncio
+                import json
+                from .llm_chain import generate_chat_response
+                
+                prompt = "You are a legal assistant. I will provide a list of raw extracted timeline events from a case document. Please rewrite the 'description' field for each event to make it highly readable, concise, and understandable for a user. Return the output as a valid JSON array of objects, where each object has 'index' (matching the input) and 'description' (the enhanced text). Do not wrap in markdown.\n\nEvents:\n"
+                for i, ev in enumerate(unique_events):
+                    prompt += f"[{i}] Date: {ev['event_date'].strftime('%Y-%m-%d')}, Raw: {ev['description']}\n"
+                    
+                response_text = asyncio.run(generate_chat_response(prompt))
+                
+                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+                if json_match:
+                    enhanced_data = json.loads(json_match.group(0))
+                else:
+                    enhanced_data = json.loads(response_text)
+                    
+                for item in enhanced_data:
+                    idx = int(item.get("index", -1))
+                    if 0 <= idx < len(unique_events):
+                        unique_events[idx]["description"] = item.get("description", unique_events[idx]["description"])
+            except Exception as e:
+                logger.error(f"Failed to enhance timeline with AI: {e}")
         
         logger.info(f"Generated {len(unique_events)} timeline events.")
         return unique_events

@@ -1,7 +1,7 @@
 import json
 from sqlalchemy.orm import Session
 from ..models import Case, Document, ExtractedEntity, TimelineEvent, CaseReport
-from .llm_chain import get_llm_response
+from .llm_chain import generate_chat_response
 import asyncio
 
 def generate_case_report_sync(db: Session, case_id: str, user_id: str) -> CaseReport:
@@ -19,13 +19,15 @@ def generate_case_report_sync(db: Session, case_id: str, user_id: str) -> CaseRe
         
     return report
 
-async def process_report_async(db: Session, case_id: str, report_id: str):
+async def process_report_async(case_id: str, report_id: str):
     """Background task that actually talks to the LLM and saves the result."""
-    report = db.query(CaseReport).filter(CaseReport.id == report_id).first()
-    if not report:
-        return
-
+    from ..database import SessionLocal
+    db = SessionLocal()
     try:
+        report = db.query(CaseReport).filter(CaseReport.id == report_id).first()
+        if not report:
+            return
+
         # Fetch case data
         case = db.query(Case).filter(Case.id == case_id).first()
         documents = db.query(Document).filter(Document.case_id == case_id).all()
@@ -56,7 +58,7 @@ Required JSON Schema:
 }}
 """
         # Call LLM
-        response_text = await get_llm_response(prompt)
+        response_text = await generate_chat_response(prompt)
         
         # Parse JSON
         import re
@@ -73,3 +75,5 @@ Required JSON Schema:
         report.status = "FAILED"
         report.report_json = {"error": str(e)}
         db.commit()
+    finally:
+        db.close()

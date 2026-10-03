@@ -23,5 +23,5 @@ def get_case_report(case_id: str, db: Session = Depends(get_db), current_user_id
 @router.post("/{case_id}/generate")
 def generate_report(case_id: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user_id: str = Depends(get_current_user)):
     report = generate_case_report_sync(db, case_id, current_user_id)
-    background_tasks.add_task(process_report_async, db, case_id, report.id)
+    background_tasks.add_task(process_report_async, case_id, report.id)
     return {"status": report.status, "id": report.id}

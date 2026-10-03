@@ -1,11 +1,10 @@
 import os
 import requests
+from dotenv import load_dotenv
 
-api_key = "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"
-headers = {
-    "Authorization": f"Bearer {api_key}",
-    "Content-Type": "application/json"
-}
-
-response = requests.get("https://api.groq.com/openai/v1/models", headers=headers)
-print(response.json())
+load_dotenv("../.env")
+api_key = os.getenv("GROQ_API_KEY")
+print(f"API Key present: {bool(api_key)}")
+resp = requests.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {api_key}"})
+data = resp.json()
+print([m.get("id") for m in data.get("data", [])])

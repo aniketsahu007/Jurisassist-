@@ -14,7 +14,7 @@ import {
   ShieldAlert,
   CircleCheck,
   RefreshCcw,
-  Sparkles,
+  BrainCircuit,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -206,7 +206,7 @@ export default function AIReportPage() {
               {report.status === "NONE" || report.status === "FAILED" ? (
                 <div className="flex flex-col items-center justify-center h-32 w-32 rounded-full border-4 border-muted border-dashed">
                   <Button onClick={() => generate()} disabled={isGenerating || !selectedCaseId}>
-                    {isGenerating ? <RefreshCcw className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    {isGenerating ? <RefreshCcw className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
                     {isGenerating ? "Generating..." : "Generate AI Report"}
                   </Button>
                 </div>
@@ -233,7 +233,7 @@ export default function AIReportPage() {
       >
         <div className="space-y-3">
           {report.executiveSummary.map((p, i) => (
-            <p key={i} className="text-sm leading-relaxed text-muted-foreground">
+            <p key={i} className="text-[15px] font-serif leading-relaxed text-muted-foreground">
               {p}
             </p>
           ))}

@@ -10,7 +10,15 @@ export function useDashboard() {
   return {
     loading,
     metrics: data?.metrics || [],
-    activity: data?.activityFeed || [],
+    activity: (data?.activityFeed || []).map((item: any) => ({
+      id: item.id,
+      kind: item.type === "Document Upload" ? "document" : item.type === "AI Analysis" ? "ai" : "filing",
+      actor: "You",
+      action: item.title.split(" ")[0],
+      target: item.title.split(" ").slice(1).join(" "),
+      caseNumber: "N/A",
+      timestamp: item.timestamp,
+    })),
     notifications: data?.notifications || [],
     casesByStatus: data?.casesByStatus || [],
     hearingsOverTime: data?.hearingsOverTime || [],

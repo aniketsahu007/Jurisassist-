@@ -5,7 +5,7 @@ import {
   Briefcase,
   FileText,
   CalendarClock,
-  Sparkles,
+  BrainCircuit,
   BarChart3,
   Search,
   Brain,
@@ -40,7 +40,7 @@ const workspace = [
 ];
 
 const intelligence = [
-  { title: "AI Assistant", url: "/assistant", icon: Sparkles },
+  { title: "AI Assistant", url: "/assistant", icon: BrainCircuit },
   { title: "Reports", url: "/reports", icon: BarChart3 },
   { title: "Precedent Search", url: "/precedents", icon: Search },
   { title: "AI Memory", url: "/memory", icon: Brain },
@@ -98,15 +98,17 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2.5 px-1.5 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Scale className="h-4 w-4" />
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="font-display text-base leading-none font-semibold">jurisAssist</p>
-              <p className="mt-1 truncate text-[11px] text-muted-foreground">Legal Intelligence</p>
+          <Link to="/" className="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition-opacity">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
+              <img src="/logo.jpg" alt="jurisAssist Logo" className="h-full w-full object-cover" />
             </div>
-          )}
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="font-display text-base leading-none font-semibold">jurisAssist</p>
+                <p className="mt-1 truncate text-[11px] text-muted-foreground">Legal Intelligence</p>
+              </div>
+            )}
+          </Link>
         </div>
       </SidebarHeader>
 

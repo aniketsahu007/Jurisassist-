@@ -4,7 +4,7 @@ import {
   ChevronRight,
   FileText,
   Download,
-  Sparkles,
+  BrainCircuit,
   MapPin,
   Scale,
   Building2,
@@ -67,7 +67,7 @@ export default function DocumentViewerPage() {
             <Download className="mr-2 h-4 w-4" /> Export
           </Button>
           <Button size="sm">
-            <Sparkles className="mr-2 h-4 w-4" /> Summarise
+            <BrainCircuit className="mr-2 h-4 w-4" /> Summarise
           </Button>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function DocumentViewerPage() {
               <h2 className="mt-6 text-center font-display text-base font-semibold">
                 {current.heading}
               </h2>
-              <div className="mt-6 space-y-4 text-sm leading-7">
+              <div className="mt-6 space-y-4 text-[15px] font-serif leading-7">
                 {current.paragraphs.map((para, i) => (
                   <p key={i} className="text-justify">
                     <span className="mr-2 font-mono text-[11px] text-muted-foreground">

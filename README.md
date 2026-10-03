@@ -1,76 +1,101 @@
-# Legal Insight Hub
+# jurisAssist — AI Legal Intelligence Platform
 
-Build a modern, professional, AI-powered Legal Intelligence Platform — frontend only.
+jurisAssist is a modern, professional, AI-powered Legal Intelligence Platform designed to help legal professionals manage cases, analyze documents with AI, find legal precedents, and uncover patterns in judicial rulings.
 
-TECH STACK:
-
+## Tech Stack
+**Frontend:**
 - Vite + React + TypeScript
+- React Router & TanStack Query
+- Tailwind CSS & shadcn/ui
+- Recharts
 
-- React Router for routing (NOT Next.js — no server actions, no API routes)
+**Backend:**
+- Python 3.10+ & FastAPI
+- PostgreSQL + SQLAlchemy + Alembic (Supabase hosted)
+- Supabase Auth & Storage
+- ChromaDB (Local Vector Store with ONNX `all-MiniLM-L6-v2`)
+- LLM Integration (Groq API, Gemini, etc.)
+- spaCy for NLP (Entity Extraction)
+- Tesseract OCR (via PyMuPDF / pytesseract)
 
-- Tailwind CSS
+## Local Setup Instructions
 
-- shadcn/ui + Radix UI
+### 1. Prerequisites
+- **Node.js** (v18+)
+- **Python** (v3.10+)
+- **Tesseract OCR**: Needs to be installed on your system for document processing.
+- A **Supabase** project (for PostgreSQL database, Auth, and Storage).
+- A **Groq / OpenAI API Key** for the LLM pipeline.
 
-- lucide-react icons
+### 2. Environment Variables
+Create a `.env` file in the root directory and populate it:
 
-- Recharts for charts
+```env
+# Database
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
 
-HARD CONSTRAINTS:
+# Supabase Settings
+SUPABASE_URL="https://YOUR_PROJECT_ID.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+SUPABASE_JWT_SECRET="your-jwt-secret"
+VITE_SUPABASE_URL="https://YOUR_PROJECT_ID.supabase.co"
+VITE_SUPABASE_ANON_KEY="your-anon-key"
 
-- Frontend only. Do NOT create authentication, backend APIs, database schemas, or server-side logic.
+# Frontend Configuration
+VITE_API_URL="http://localhost:8000"
+FRONTEND_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
 
-- Do NOT enable or configure Supabase — this app will connect to a separate FastAPI backend later. Leave that as a future integration point, not a live one.
+# LLM Fallback Chain (Groq example)
+GROQ_API_KEY="your-groq-api-key"
+LLM_PROVIDER_1_NAME="Groq-Mixtral"
+LLM_PROVIDER_1_BASE_URL="https://api.groq.com/openai/v1"
+LLM_PROVIDER_1_API_KEY="your-groq-api-key"
+LLM_PROVIDER_1_MODEL="mixtral-8x7b-32768"
+```
 
-- All data must be realistic dummy legal data (real-sounding case names, statutes, judges, courts, FIR numbers) — never lorem ipsum.
+### 3. Backend Setup
 
-- Put all mock data in typed files under src/data/ (e.g. cases.ts, documents.ts), and access it through hooks like useCases() so it can be swapped for real API calls later with minimal refactor.
+Navigate to the `backend` directory and set up your Python virtual environment:
+```bash
+cd backend
+python -m venv .venv
 
-PROJECT STRUCTURE:
+# On Windows:
+.venv\Scripts\activate
+# On Mac/Linux:
+source .venv/bin/activate
 
-src/pages, src/components, src/data, src/hooks, src/lib
+# Install dependencies
+pip install -r requirements.txt
 
-DESIGN:
+# Download spaCy model required for entity extraction
+python -m spacy download en_core_web_sm
+```
 
-Enterprise SaaS feel — comparable density and polish to Notion, Linear, Cursor, Vercel Dashboard. Full responsive design, dark mode + light mode toggle, purposeful animations, loading skeletons, empty states, professional spacing. Give it a distinct visual identity, not generic shadcn defaults.
+Run database migrations to generate the schema:
+```bash
+alembic upgrade head
+```
 
-BUILD THIS PHASE — App Shell + Dashboard + Case Management:
+Start the FastAPI development server:
+```bash
+uvicorn app.main:app --reload
+```
+The API will run at `http://localhost:8000`.
 
-1. App Shell
+### 4. Frontend Setup
 
-   - Sidebar navigation (Dashboard, Cases, Documents, Timeline, AI Assistant, Reports, Precedent Search, AI Memory, Pattern Analysis, Notifications, Profile, Settings)
+Open a new terminal in the root directory:
+```bash
+# Install dependencies
+npm install
 
-   - Top navbar with search, notifications bell, theme toggle, profile menu
-
-   - Responsive layout with collapsible sidebar
-
-2. Dashboard page
-
-   - Cards: Active Cases, Cases Uploaded Today, Upcoming Hearings, AI Reports Generated
-
-   - Recent Activity feed
-
-   - Notifications preview panel
-
-   - At least 2 charts with mock data (e.g. cases by status, hearings over time)
-
-3. Case Management page
-
-   - Case cards showing: Case Name, Client, Court, Judge, FIR Number, Case Type, Current Status, Next Hearing, Last Updated
-
-   - Search bar, filter dropdowns, sort control, pagination
-
-   - At least 12 realistic mock cases
-
-Do not build any other pages yet — I'll continue in follow-up messages.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+# Start the Vite dev server
 npm run dev
 ```
+The UI will run at `http://localhost:5173`.
+
+## Architecture Features
+- **Local ChromaDB:** We use local vector storage (`backend/chroma_data/`) for cost-efficiency. It leverages `all-MiniLM-L6-v2` via ONNX runtime for lightweight, fast embeddings without needing an external embedding API key.
+- **LLM Fallback Chain:** The backend `llm_chain.py` automatically falls back through multiple LLM providers/models if rate limits or 503 errors occur.
+- **Background Tasks:** Document OCR, vector ingestion, and long-running AI report generation are handed off to FastAPI `BackgroundTasks` to keep the UI responsive.

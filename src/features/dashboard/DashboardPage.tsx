@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarPlus, Sparkles } from "lucide-react";
+import { CalendarPlus, BrainCircuit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "./useDashboard";
 import { useNotificationCenter } from "@/features/notifications/useNotificationCenter";
@@ -30,7 +30,7 @@ export default function DashboardPage() {
           </Button>
           <Button size="sm" asChild>
             <Link to="/reports">
-              <Sparkles className="mr-2 h-4 w-4" /> Generate AI report
+              <BrainCircuit className="mr-2 h-4 w-4" /> Generate AI report
             </Link>
           </Button>
         </div>

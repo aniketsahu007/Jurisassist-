@@ -16,7 +16,7 @@ import {
   Scale,
   Search,
   ShieldCheck,
-  Sparkles,
+  BrainCircuit,
   Workflow,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -94,7 +94,7 @@ const architecture = [
     note: "ChromaDB embeddings, PostgreSQL records",
   },
   {
-    icon: Sparkles,
+    icon: BrainCircuit,
     label: "Multi-model AI routing",
     note: "Long-context analysis and fast drafting",
   },
@@ -306,7 +306,7 @@ export default function LandingPage() {
         <div className="mt-10 grid gap-5 md:grid-cols-2">
           {capabilities.map((c) => (
             <div key={c.title} className="panel flex gap-4 p-5">
-              <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <BrainCircuit className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <h3 className="font-display text-base font-semibold">{c.title}</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">{c.body}</p>

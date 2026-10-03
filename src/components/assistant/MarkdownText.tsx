@@ -105,5 +105,5 @@ export function MarkdownText({ text }: { text: string }) {
     );
   }
 
-  return <div className="space-y-2.5">{blocks}</div>;
+  return <div className="space-y-3 font-serif text-[15px]">{blocks}</div>;
 }

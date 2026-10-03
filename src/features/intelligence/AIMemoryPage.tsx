@@ -6,7 +6,7 @@ import {
   Lightbulb,
   Search,
   ScrollText,
-  Sparkles,
+  BrainCircuit,
   StickyNote,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -87,7 +87,7 @@ export default function AIMemoryPage() {
 
       <div className="panel p-5">
         <div className="relative">
-          <Sparkles className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-primary" />
+          <BrainCircuit className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-primary" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

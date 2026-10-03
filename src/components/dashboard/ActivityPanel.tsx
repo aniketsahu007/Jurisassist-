@@ -1,4 +1,4 @@
-import { FileText, Gavel, Sparkles, ScrollText, Stamp, Inbox } from "lucide-react";
+import { FileText, Gavel, BrainCircuit, ScrollText, Stamp, Inbox } from "lucide-react";
 import type { ActivityItem, NotificationItem } from "@/data/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const kindIcon = {
   filing: ScrollText,
   hearing: Gavel,
-  ai: Sparkles,
+  ai: BrainCircuit,
   document: FileText,
   order: Stamp,
 } as const;
