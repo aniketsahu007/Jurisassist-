@@ -38,7 +38,7 @@ class IndianKanoonClient:
         return signer.sign(digest)
 
     @classmethod
-    def search(cls, query: str, pagenum: int = 0, doctypes: str = "supremecourt") -> dict:
+    def search(cls, query: str, pagenum: int = 0, doctypes: str = "supremecourt", sortby: str = None) -> dict:
         if not IK_API_USER_ID:
             raise ValueError("IK_API_USER_ID is not set in environment variables.")
 
@@ -62,6 +62,9 @@ class IndianKanoonClient:
         
         if doctypes:
             query = f"{query} doctypes: {doctypes}"
+            
+        if sortby:
+            query = f"{query} sortby: {sortby}"
             
         payload = {
             "formInput": query,

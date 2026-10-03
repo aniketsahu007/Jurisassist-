@@ -29,6 +29,7 @@ async def search_precedents(
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user),
 ):
+    search_query = req.query
     if req.case_id:
         case = db.query(Case).filter(
             Case.id == req.case_id,
@@ -38,9 +39,27 @@ async def search_precedents(
         if not case:
             raise HTTPException(status_code=404, detail="Case not found or access denied.")
             
-    results = await fetch_and_rerank(req.query, req.top_k)
+        if len(req.query) < 20 or req.query.lower().strip() in ["similar", "precedent", "precedents"]:
+            if case.summary:
+                from ..services.llm_chain import generate_chat_response
+                prompt = f"""
+                You are a legal search expert. The user is searching IndianKanoon for precedents similar to their case.
+                User's raw query: "{req.query}"
+                Case Summary: {case.summary}
+                
+                Based on the case summary, generate a dense, optimized keyword search query (10-20 words) containing the primary legal issues, statutes, and factual keywords.
+                Return ONLY the search query string without any quotes, preamble, or markdown.
+                """
+                try:
+                    expanded = await generate_chat_response(prompt)
+                    if expanded and len(expanded) > 5:
+                        search_query = expanded.strip('"\'')
+                except Exception as e:
+                    pass
+
+    results = await fetch_and_rerank(search_query, req.top_k)
     return PrecedentSearchResponse(
-        query=req.query,
+        query=search_query,
         results=[PrecedentSearchResultItem(**r) for r in results]
     )
 

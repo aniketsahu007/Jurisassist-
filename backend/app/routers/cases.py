@@ -210,21 +210,24 @@ def get_case_timeline(
 
         # Smart dynamic headline generation based on description context
         desc_lower = ev.description.lower()
+        final_desc = ev.description
         dynamic_title = ev.event_type.name.replace("_", " ").title()
         
-        if "extortion" in desc_lower: dynamic_title = "Extortion Allegations"
-        elif "police service" in desc_lower: dynamic_title = "Police Service Record"
-        elif "written complaint" in desc_lower: dynamic_title = "Written Complaint Filed"
-        elif "fir" in desc_lower: dynamic_title = "FIR Registration"
-        elif "arrest" in desc_lower: dynamic_title = "Arrest Executed"
-        elif "bail" in desc_lower: dynamic_title = "Bail Proceedings"
-        elif "charge sheet" in desc_lower: dynamic_title = "Charge Sheet Filed"
-        elif "judgment" in desc_lower: dynamic_title = "Final Judgment"
+        # Check if the LLM embedded a professional title
+        if "|||" in ev.description:
+            title_part, desc_part = ev.description.split("|||", 1)
+            dynamic_title = title_part.strip()
+            final_desc = desc_part.strip()
+            desc_lower = final_desc.lower()
         else:
-            words = ev.description.split()
-            if len(words) > 4 and ev.event_type.name == "INCIDENT":
-                first_few = " ".join(words[:4]).strip(".,;:!'\"")
-                dynamic_title = first_few.title() + "..."
+            if "extortion" in desc_lower: dynamic_title = "Extortion Allegations"
+            elif "police service" in desc_lower: dynamic_title = "Police Service Record"
+            elif "written complaint" in desc_lower: dynamic_title = "Written Complaint Filed"
+            elif "fir" in desc_lower: dynamic_title = "FIR Registration"
+            elif "arrest" in desc_lower: dynamic_title = "Arrest Executed"
+            elif "bail" in desc_lower: dynamic_title = "Bail Proceedings"
+            elif "charge sheet" in desc_lower: dynamic_title = "Charge Sheet Filed"
+            elif "judgment" in desc_lower: dynamic_title = "Final Judgment"
 
         formatted_events.append({
             "id": ev.id,
@@ -232,11 +235,11 @@ def get_case_timeline(
             "stage": stage_mapping.get(ev.event_type, "Incident"),
             "status": status,
             "title": dynamic_title,
-            "description": ev.description,
+            "description": final_desc,
             "details": {
                 "location": "Not specified",
                 "officer": "Unknown",
-                "notes": ev.description,
+                "notes": final_desc,
                 "documents": []
             }
         })

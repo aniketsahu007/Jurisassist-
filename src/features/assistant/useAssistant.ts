@@ -137,7 +137,7 @@ export function useAssistant() {
   });
 
   const send = useCallback(
-    (prompt: string, action?: QuickActionId) => {
+    (prompt: string, action?: QuickActionId, fallbackCaseId?: string) => {
       const text = prompt.trim();
       if (!text || thinking) return;
 
@@ -145,7 +145,7 @@ export function useAssistant() {
 
       chatMutation.mutate({
         query: text,
-        case_id: active.caseNumber !== "N/A" ? active.caseNumber : undefined,
+        case_id: active.caseNumber !== "N/A" ? active.caseNumber : fallbackCaseId,
         conversation_id: conversationId,
         history: messages.map((m) => ({ role: m.role, content: m.content })),
       });
@@ -159,12 +159,30 @@ export function useAssistant() {
     setConversationId(null);
   }, []);
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => assistantApi.deleteConversation(id),
+    onSuccess: (_, deletedId) => {
+      queryClient.invalidateQueries({ queryKey: ["assistant-conversations"] });
+      if (deletedId === activeId || deletedId === conversationId) {
+        newThread();
+      }
+    },
+  });
+
+  const deleteThread = useCallback(
+    (id: string) => {
+      deleteMutation.mutate(id);
+    },
+    [deleteMutation]
+  );
+
   return {
     threads,
     active,
     activeId: active.id,
     select: selectThread,
     newThread,
+    deleteThread,
     send,
     thinking,
     streaming,

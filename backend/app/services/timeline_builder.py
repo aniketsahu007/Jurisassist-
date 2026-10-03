@@ -91,7 +91,7 @@ class TimelineBuilder:
                 import json
                 from .llm_chain import generate_chat_response
                 
-                prompt = "You are a legal assistant. I will provide a list of raw extracted timeline events from a case document. Please rewrite the 'description' field for each event to make it highly readable, concise, and understandable for a user. Return the output as a valid JSON array of objects, where each object has 'index' (matching the input) and 'description' (the enhanced text). Do not wrap in markdown.\n\nEvents:\n"
+                prompt = "You are an expert legal assistant. I will provide a list of raw extracted timeline events from a case document. For each event, generate a short, professional, 2-5 word 'title' (e.g., 'FIR Registration', 'Cross-Examination of Witness') and rewrite the 'description' to be highly readable, concise, and understandable. Return the output as a valid JSON array of objects, where each object has 'index' (matching the input), 'title' (the short headline), and 'description' (the enhanced text). Do not wrap in markdown.\n\nEvents:\n"
                 for i, ev in enumerate(unique_events):
                     prompt += f"[{i}] Date: {ev['event_date'].strftime('%Y-%m-%d')}, Raw: {ev['description']}\n"
                     
@@ -106,7 +106,12 @@ class TimelineBuilder:
                 for item in enhanced_data:
                     idx = int(item.get("index", -1))
                     if 0 <= idx < len(unique_events):
-                        unique_events[idx]["description"] = item.get("description", unique_events[idx]["description"])
+                        title = item.get("title", "").strip()
+                        desc = item.get("description", unique_events[idx]["description"]).strip()
+                        if title:
+                            unique_events[idx]["description"] = f"{title}|||{desc}"
+                        else:
+                            unique_events[idx]["description"] = desc
             except Exception as e:
                 logger.error(f"Failed to enhance timeline with AI: {e}")
         

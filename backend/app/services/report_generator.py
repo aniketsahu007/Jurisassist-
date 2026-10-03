@@ -31,7 +31,8 @@ async def process_report_async(case_id: str, report_id: str):
         # Fetch case data
         case = db.query(Case).filter(Case.id == case_id).first()
         documents = db.query(Document).filter(Document.case_id == case_id).all()
-        entities = db.query(ExtractedEntity).filter(ExtractedEntity.case_id == case_id).all()
+        document_ids = [d.id for d in documents]
+        entities = db.query(ExtractedEntity).filter(ExtractedEntity.document_id.in_(document_ids)).all() if document_ids else []
         timeline = db.query(TimelineEvent).filter(TimelineEvent.case_id == case_id).order_by(TimelineEvent.event_date).all()
         
         # Build prompt
@@ -43,7 +44,7 @@ Case Title: {case.title if case else "Unknown"}
 Summary: {case.summary if case else "None"}
 
 Entities:
-{', '.join([f"{e.entity_type.name}: {e.entity_value}" for e in entities[:50]])}
+{', '.join([f"{e.entity_type.name}: {e.value}" for e in entities[:50]])}
 
 Timeline:
 {chr(10).join([f"{t.event_date.strftime('%Y-%m-%d') if t.event_date else 'Unknown'}: {t.description}" for t in timeline[:30]])}
@@ -63,10 +64,16 @@ Required JSON Schema:
         # Parse JSON
         import re
         json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-        if json_match:
-            report_data = json.loads(json_match.group(0))
-        else:
-            report_data = json.loads(response_text)
+        
+        try:
+            if json_match:
+                report_data = json.loads(json_match.group(0))
+            else:
+                report_data = json.loads(response_text)
+        except Exception as parse_e:
+            with open("failed_llm_response.txt", "w", encoding="utf-8") as f:
+                f.write(response_text)
+            raise parse_e
             
         report.report_json = report_data
         report.status = "COMPLETED"

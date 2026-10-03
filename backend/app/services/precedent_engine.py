@@ -79,12 +79,97 @@ def fetch_ik_candidates(query: str, doctypes: str = "supremecourt") -> List[Dict
         logger.warning(f"Failed to fetch IK for query '{query}': {e}")
         return []
 
+async def _llm_rerank(query: str, candidates: List[Dict]) -> List[Dict]:
+    """Use the LLM to score each candidate's relevance to the query on a 0-100 scale.
+    This produces genuine relevance scores, not inflated cosine similarity."""
+    from ..services.llm_chain import _get_providers, breaker, _extract_content
+    from openai import AsyncOpenAI
+    
+    providers = _get_providers()
+    if not providers:
+        logger.warning("No LLM providers configured for reranking. Falling back to IK rank.")
+        return candidates
+    
+    # Build a concise list for the LLM
+    candidate_lines = []
+    for i, c in enumerate(candidates):
+        title = re.sub(r'<[^>]*>?', '', c.get("title", ""))[:120]
+        headline = re.sub(r'<[^>]*>?', '', c.get("headline", ""))[:200]
+        candidate_lines.append(f"{i}. {title} | {headline}")
+    
+    candidates_text = "\n".join(candidate_lines)
+    
+    prompt = f"""You are a legal relevance scoring engine. Score each candidate judgment's relevance to the user's search query on a scale of 0 to 100.
+
+USER QUERY: {query}
+
+CANDIDATE JUDGMENTS:
+{candidates_text}
+
+Reply ONLY with a JSON object containing a "scores" array, in this exact format:
+{{"scores": [{{"index": 0, "score": 85}}, {{"index": 1, "score": 42}}]}}
+
+Rules:
+- Score 90-100: Directly on point — same legal issue, same statute, same factual pattern
+- Score 70-89: Highly relevant — related legal principle or closely analogous facts
+- Score 40-69: Somewhat relevant — tangentially related area of law
+- Score 0-39: Low relevance — different area of law or only superficial keyword match
+- Be honest and strict. Most candidates from a keyword search will be 40-70 range.
+"""
+    
+    for provider in providers:
+        if breaker.is_open(provider["id"]):
+            continue
+        try:
+            client = AsyncOpenAI(base_url=provider["base_url"], api_key=provider["api_key"])
+            response = await asyncio.wait_for(client.chat.completions.create(
+                model=provider["model"],
+                messages=[
+                    {"role": "system", "content": "You are a legal relevance scoring engine. Output only valid JSON."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.0,
+                max_tokens=500,
+                response_format={"type": "json_object"}
+            ), timeout=12.0)
+            
+            text = _extract_content(response.choices[0].message)
+            if not text:
+                raise ValueError("Empty LLM response")
+                
+            import json
+            data = json.loads(text)
+            
+            # Handle both {"scores": [...]} and direct [...] formats
+            scores_list = data if isinstance(data, list) else data.get("scores", data.get("results", []))
+            
+            if not isinstance(scores_list, list):
+                raise ValueError(f"Unexpected LLM response format: {type(scores_list)}")
+            
+            # Apply scores to candidates
+            for item in scores_list:
+                idx = item.get("index", -1)
+                score = item.get("score", 0)
+                if 0 <= idx < len(candidates):
+                    candidates[idx]["vector_sim"] = max(0.0, min(1.0, score / 100.0))
+            
+            logger.info(f"LLM reranking complete with provider {provider['name']}")
+            return candidates
+            
+        except Exception as e:
+            logger.error(f"LLM reranking failed with {provider['name']}: {e}")
+            breaker.record_failure(provider["id"])
+    
+    # If all LLM providers fail, fall back to embedding-based scoring (honest, no inflation)
+    logger.warning("All LLM providers failed for reranking. Falling back to embedding similarity.")
+    return candidates
+
+
 async def fetch_and_rerank(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
     # Exact Match Bypass
     if '"' in query or " v. " in query.lower() or re.search(r'\b\d+\s+scc\s+\d+\b', query, re.IGNORECASE):
         logger.info("Exact match bypass detected. Skipping reranking.")
         cands = await run_in_threadpool(fetch_ik_candidates, query, "supremecourt")
-        # Give them dummy scores
         for idx, c in enumerate(cands):
             c["vector_sim"] = 1.0 - (idx * 0.01)
         return cands[:top_k]
@@ -96,25 +181,15 @@ async def fetch_and_rerank(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
         cands = await run_in_threadpool(fetch_ik_candidates, vq, "supremecourt")
         variant_results.append(cands)
         if len(variants) > 1:
-            await asyncio.sleep(1.0) # Respect IK 1 req/sec limit
+            await asyncio.sleep(1.0)  # Respect IK 1 req/sec limit
             
     merged_candidates = dedupe(variant_results)
     if not merged_candidates:
         return []
-        
-    # Reranking using ONNX threadpool
-    texts_to_embed = [query] + [f"{c['title']} {c['headline']}" for c in merged_candidates]
-    embeddings = await run_in_threadpool(_do_embed, texts_to_embed)
     
-    query_emb = np.array(embeddings[0])
-    doc_embs = np.array(embeddings[1:])
+    # Use LLM for genuine relevance scoring
+    await _llm_rerank(query, merged_candidates)
     
-    for idx, c in enumerate(merged_candidates):
-        vec_sim = cosine_similarity(query_emb, doc_embs[idx])
-        c["vector_sim"] = float(vec_sim)
-        rank = c.get('ik_rank', idx)
-        rank_score = max(0.0, 1.0 - (rank / 15.0))
-        c["hybrid_score"] = float(vec_sim * 0.4 + rank_score * 0.6)
-        
-    reranked = sorted(merged_candidates, key=lambda x: x.get("hybrid_score", 0), reverse=True)
+    # Sort by the LLM-assigned relevance score
+    reranked = sorted(merged_candidates, key=lambda x: x.get("vector_sim", 0), reverse=True)
     return reranked[:top_k]

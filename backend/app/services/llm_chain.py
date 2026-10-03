@@ -79,6 +79,16 @@ def _get_providers():
             })
     return providers
 
+def _extract_content(message) -> str:
+    """Extract text from a chat completion message.
+    Reasoning models (e.g. openai/gpt-oss-*) sometimes return an empty
+    'content' with their chain-of-thought in 'reasoning'.  The reasoning
+    field is NOT the final answer, so we do NOT fall back to it.
+    Returning empty string here lets the caller treat it as a failure
+    and try the next provider in the fallback chain."""
+    content = (message.content or "").strip()
+    return content
+
 async def _call_provider(provider: dict, query: str, fragment: str) -> str:
     client = AsyncOpenAI(base_url=provider["base_url"], api_key=provider["api_key"])
     user_prompt = f"User Query: {query}\n\nExcerpt:\n{fragment}"
@@ -94,7 +104,10 @@ async def _call_provider(provider: dict, query: str, fragment: str) -> str:
         max_tokens=250,
     ), timeout=8.0)
     
-    return response.choices[0].message.content.strip()
+    text = _extract_content(response.choices[0].message)
+    if not text:
+        raise ValueError(f"Provider {provider['name']} returned empty response")
+    return text
 
 async def generate_summary(docid: str, query: str, fragment: str) -> Dict[str, Any]:
     query_hash = hashlib.md5(query.encode()).hexdigest()
@@ -173,9 +186,12 @@ async def generate_chat_response(query: str) -> str:
                     {"role": "user", "content": query}
                 ],
                 temperature=0.7,
-                max_tokens=500,
-            ), timeout=10.0)
-            return response.choices[0].message.content.strip()
+                max_tokens=3000,
+            ), timeout=30.0)
+            text = _extract_content(response.choices[0].message)
+            if not text:
+                raise ValueError(f"Provider {provider['name']} returned empty content")
+            return text
         except Exception as e:
             logger.error(f"Chat failed with provider {provider['name']}: {e}")
             breaker.record_failure(provider["id"])

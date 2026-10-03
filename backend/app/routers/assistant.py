@@ -227,6 +227,10 @@ def delete_conversation(
     )
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
+        
+    # Explicitly delete messages first to avoid FK constraint issues
+    db.query(ConversationMessage).filter(ConversationMessage.conversation_id == conversation_id).delete()
+    
     db.delete(conv)
     db.commit()
     return {"ok": True}

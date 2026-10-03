@@ -1,11 +1,56 @@
+"""
+Retroactively enhance existing timeline event descriptions using the LLM.
+Handles Unicode safely on Windows and processes events one-by-one for reliability.
+"""
 import asyncio
 import json
 import re
 import os
+import sys
+
+# Force UTF-8 output on Windows
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import TimelineEvent
 from app.services.llm_chain import generate_chat_response
+
+
+async def enhance_single_event(event: TimelineEvent) -> str | None:
+    """Send a single event to the LLM for enhancement. Returns enhanced text or None."""
+    date_str = event.event_date.strftime('%Y-%m-%d') if event.event_date else "Unknown"
+    
+    # Clean the raw description of non-printable / garbled chars
+    raw = event.description or ""
+    raw = re.sub(r'[^\x20-\x7E\u00A0-\u024F\u0900-\u097F]', ' ', raw)  # keep ASCII + Latin + Devanagari
+    raw = re.sub(r'\s+', ' ', raw).strip()
+    
+    if len(raw) < 15:
+        return None  # Too short to meaningfully enhance
+    
+    prompt = (
+        "You are a legal assistant. Rewrite the following raw text extracted from a legal document "
+        "into a single clear, concise, human-readable sentence describing what happened on this date. "
+        "Do NOT output JSON. Do NOT include any markdown. Output ONLY the rewritten sentence.\n\n"
+        f"Date: {date_str}\n"
+        f"Raw text: {raw}\n\n"
+        "Rewritten description:"
+    )
+    
+    response = await generate_chat_response(prompt)
+    
+    # Validate the response is reasonable
+    if not response or len(response) < 10:
+        return None
+    if response.startswith("I'm sorry") or response.startswith("I'm currently"):
+        return None
+    
+    # Clean up: remove leading/trailing quotes if present
+    response = response.strip().strip('"').strip("'").strip()
+    return response
+
 
 async def patch_timelines():
     db = SessionLocal()
@@ -15,42 +60,39 @@ async def patch_timelines():
             print("No events found.")
             return
 
-        print(f"Found {len(events)} events to process.")
+        total = len(events)
+        print(f"Found {total} events to process.")
         
-        batch_size = 10
-        for i in range(0, len(events), batch_size):
-            batch = events[i:i + batch_size]
-            prompt = "You are a legal assistant. I will provide a list of raw extracted timeline events from a case document. Please rewrite the 'description' field for each event to make it highly readable, concise, and understandable for a user. Return the output as a valid JSON array of objects, where each object has 'index' (matching the input) and 'description' (the enhanced text). Do not wrap in markdown.\n\nEvents:\n"
-            
-            for idx, ev in enumerate(batch):
-                date_str = ev.event_date.strftime('%Y-%m-%d') if ev.event_date else "Unknown"
-                prompt += f"[{idx}] Date: {date_str}, Raw: {ev.description}\n"
-                
+        success_count = 0
+        fail_count = 0
+        
+        for i, event in enumerate(events):
             try:
-                print(f"Processing batch {i//batch_size + 1}...")
-                response_text = await generate_chat_response(prompt)
-                print(f"DEBUG RESPONSE: {response_text}")
+                print(f"[{i+1}/{total}] Processing event {event.id} (date: {event.event_date})...")
+                enhanced = await enhance_single_event(event)
                 
-                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
-                if json_match:
-                    enhanced_data = json.loads(json_match.group(0))
+                if enhanced:
+                    event.description = enhanced
+                    db.commit()
+                    success_count += 1
+                    print(f"  ✓ Enhanced: {enhanced[:80]}...")
                 else:
-                    enhanced_data = json.loads(response_text)
+                    fail_count += 1
+                    print(f"  - Skipped (too short or LLM unavailable)")
                     
-                for item in enhanced_data:
-                    idx = int(item.get("index", -1))
-                    if 0 <= idx < len(batch):
-                        batch[idx].description = item.get("description", batch[idx].description)
-                        
-                db.commit()
-                print(f"Batch {i//batch_size + 1} saved.")
-            except Exception as e:
-                print(f"Failed to process batch {i//batch_size + 1}: {e}")
+                # Small delay to avoid rate limiting
+                await asyncio.sleep(0.5)
                 
-        print("Done patching timelines.")
+            except Exception as e:
+                fail_count += 1
+                print(f"  ✗ Error: {e}")
+                db.rollback()
+                await asyncio.sleep(1)
+
+        print(f"\nDone! Enhanced: {success_count}, Skipped/Failed: {fail_count}")
     finally:
         db.close()
 
+
 if __name__ == "__main__":
-    os.environ["DEV_BYPASS_AUTH"] = "1"
     asyncio.run(patch_timelines())

@@ -13,6 +13,9 @@ import {
   PenLine,
   Library,
   CalendarRange,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +23,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAssistant } from "./useAssistant";
 import { MarkdownText } from "@/components/assistant/MarkdownText";
+import { useCases } from "@/features/cases/useCases";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type QuickActionId = "summarize" | "contradictions" | "draft" | "similar" | "timeline";
 
@@ -56,36 +67,36 @@ function fmtDay(iso: string) {
 }
 
 export default function AIAssistantPage() {
-  const { threads, active, activeId, select, newThread, send, thinking, streaming, busy } =
+  const { threads, active, activeId, select, newThread, deleteThread, send, thinking, streaming, busy } =
     useAssistant();
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+
+  const { items: cases, loading: casesLoading } = useCases({ pageSize: 100 });
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (!selectedCaseId && cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [cases, selectedCaseId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [active.messages.length, streaming, thinking]);
 
   const submit = (text: string, action?: QuickActionId) => {
-    send(text, action);
+    send(text, action, selectedCaseId);
     setInput("");
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4">
-      <header>
-        <p className="text-eyebrow">Intelligence</p>
-        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          AI Legal Assistant
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Grounded in the documents on file for {active.caseNumber}. Responses are generated from
-          indexed material and always cite their source.
-        </p>
-      </header>
-
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="flex flex-col bg-background overflow-hidden h-[calc(100vh-3.5rem)] -mx-4 sm:-mx-6 lg:-mx-8 -my-6">
+      <div className={cn("grid min-w-0 flex-1 overflow-hidden h-full", isSidebarOpen ? "grid-cols-[minmax(0,1fr)] lg:grid-cols-[260px_minmax(0,1fr)]" : "grid-cols-1")}>
         {/* Conversation history */}
-        <aside className="hidden rounded-xl border bg-card shadow-panel lg:flex lg:flex-col">
+        {isSidebarOpen && (
+          <aside className="hidden rounded-xl border bg-card shadow-panel lg:flex lg:flex-col overflow-hidden">
           <div className="flex items-center justify-between border-b px-3 py-2.5">
             <p className="text-eyebrow">Conversations</p>
             <Button size="sm" variant="ghost" className="h-7 gap-1 px-2" onClick={newThread}>
@@ -93,44 +104,80 @@ export default function AIAssistantPage() {
               New
             </Button>
           </div>
-          <div className="h-[560px] space-y-1 overflow-y-auto p-2">
+          <div className="flex-1 space-y-1 overflow-y-auto p-2">
             {threads.map((t) => (
-              <button
+              <div
                 key={t.id}
-                type="button"
-                onClick={() => select(t.id)}
                 className={cn(
-                  "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
+                  "group relative w-full rounded-lg px-3 py-2.5 text-left transition-colors",
                   t.id === activeId ? "bg-secondary" : "hover:bg-surface-2",
                 )}
               >
-                <div className="flex items-center gap-2">
-                  <MessageSquare
-                    className={cn(
-                      "h-3.5 w-3.5 shrink-0",
-                      t.id === activeId ? "text-primary" : "text-muted-foreground",
-                    )}
-                  />
-                  <p className="truncate text-sm font-medium">{t.title}</p>
-                </div>
-                <p className="mt-1 truncate text-xs text-muted-foreground">{t.preview}</p>
-                <div className="mt-1.5 flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-muted-foreground">
-                    {t.caseNumber}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">{fmtDay(t.updatedAt)}</span>
-                </div>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => select(t.id)}
+                  className="w-full text-left"
+                >
+                  <div className="flex items-center gap-2 pr-6">
+                    <MessageSquare
+                      className={cn(
+                        "h-3.5 w-3.5 shrink-0",
+                        t.id === activeId ? "text-primary" : "text-muted-foreground",
+                      )}
+                    />
+                    <p className="truncate text-sm font-medium">{t.title}</p>
+                  </div>
+                  <p className="mt-1 truncate text-xs text-muted-foreground">{t.preview}</p>
+                  <div className="mt-1.5 flex items-center justify-between pr-6">
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      {t.caseNumber}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">{fmtDay(t.updatedAt)}</span>
+                  </div>
+                </button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteThread(t.id);
+                  }}
+                  className="absolute right-2 top-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3 w-3 text-destructive" />
+                </Button>
+              </div>
             ))}
           </div>
-        </aside>
+          </aside>
+        )}
 
         {/* Chat window */}
-        <section className="flex min-h-[640px] min-w-0 flex-col rounded-xl border bg-card shadow-panel">
-          <div className="flex items-center justify-between border-b px-4 py-3">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{active.title}</p>
-              <p className="font-mono text-[11px] text-muted-foreground">{active.caseNumber}</p>
+        <section className="flex min-w-0 flex-col relative h-full bg-background overflow-hidden flex-1">
+          <div className="flex items-center justify-between px-4 py-3 bg-background z-10 sticky top-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 hidden lg:flex -ml-2" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                {isSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </Button>
+              <div className="flex flex-col min-w-0">
+                <p className="truncate text-sm font-medium px-2">{active.title}</p>
+                <Select 
+                  value={activeId === "new" ? selectedCaseId : (cases.find(c => c.caseNumber === active.caseNumber)?.id || active.caseNumber)} 
+                  onValueChange={setSelectedCaseId}
+                  disabled={activeId !== "new"}
+                >
+                  <SelectTrigger className="h-6 w-auto max-w-[300px] text-[11px] bg-transparent border-none shadow-none focus:ring-0 px-2 text-muted-foreground hover:text-foreground">
+                    <SelectValue placeholder={casesLoading ? "Loading cases…" : "Choose a case"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cases.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <Badge variant="outline" className="gap-1.5">
               <Sparkle className="h-3 w-3 text-primary" />
@@ -139,7 +186,7 @@ export default function AIAssistantPage() {
           </div>
 
           <div className="min-w-0 flex-1 overflow-y-auto">
-            <div className="min-w-0 space-y-5 px-4 py-5 sm:px-6">
+            <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
               {active.messages.length === 0 && !busy && (
                 <div className="mx-auto max-w-md py-16 text-center">
                   <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
@@ -184,7 +231,9 @@ export default function AIAssistantPage() {
                       <Scale className="h-3.5 w-3.5 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1 space-y-3">
-                      <MarkdownText text={m.content} />
+                      <div className="overflow-x-auto max-w-full prose prose-sm dark:prose-invert break-words">
+                        <MarkdownText text={m.content} />
+                      </div>
                       {m.citations && (
                         <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
                           {m.citations.map((c) => (
@@ -247,78 +296,71 @@ export default function AIAssistantPage() {
             </div>
           </div>
 
-          {/* Suggested prompts */}
-          <div className="border-t px-4 pt-3">
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {suggestedPrompts.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => submit(p)}
-                  className="shrink-0 rounded-full border bg-surface-2 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:opacity-50"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex flex-wrap gap-2 px-4 pb-3">
-            {quickActions.map((a) => {
-              const Icon = actionIcon[a.id];
-              return (
-                <Button
-                  key={a.id}
-                  size="sm"
-                  variant="outline"
-                  disabled={busy}
-                  className="h-8 gap-1.5 text-xs"
-                  onClick={() => submit(a.prompt, a.id)}
-                >
-                  <Icon className="h-3.5 w-3.5 text-primary" />
-                  {a.label}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Prompt input */}
-          <div className="border-t p-3 sm:p-4">
-            <div className="rounded-xl border bg-surface-2 p-2 focus-within:border-primary/50">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    submit(input);
-                  }
-                }}
-                placeholder="Ask about exhibits, depositions, statutes or drafting…"
-                className="min-h-[64px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
-              />
-              <div className="flex items-center justify-between px-1 pt-1">
-                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <FileText className="h-3 w-3" />
-                  47 documents indexed
-                </span>
-                <Button
-                  size="sm"
-                  className="h-8 gap-1.5"
-                  disabled={busy || !input.trim()}
-                  onClick={() => submit(input)}
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  Send
-                </Button>
+          {/* Bottom Area */}
+          <div className="px-4 pb-6 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+            <div className="mx-auto max-w-4xl">
+              {/* Action buttons and Suggested Prompts combined */}
+              <div className="flex gap-2 flex-wrap pb-3 items-center justify-center">
+                {quickActions.map((a) => {
+                  const Icon = actionIcon[a.id];
+                  return (
+                    <Button
+                      key={a.id}
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      className="h-8 gap-1.5 text-[11px] shrink-0 rounded-full bg-background hover:bg-surface-2 transition-colors"
+                      onClick={() => submit(a.prompt, a.id)}
+                    >
+                      <Icon className="h-3.5 w-3.5 text-primary" />
+                      {a.label}
+                    </Button>
+                  );
+                })}
+                <div className="w-[1px] h-4 bg-border mx-1 shrink-0" />
+                {suggestedPrompts.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => submit(p)}
+                    className="shrink-0 rounded-full border bg-background px-4 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:opacity-50"
+                  >
+                    {p}
+                  </button>
+                ))}
               </div>
+
+              {/* Prompt input */}
+              <div className="rounded-3xl border border-border/40 bg-surface-2/40 backdrop-blur-md p-1.5 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 shadow-sm transition-all relative group">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      submit(input);
+                    }
+                  }}
+                  placeholder="Ask about exhibits, depositions, statutes or drafting…"
+                  className="min-h-[44px] max-h-[160px] resize-none border-0 bg-transparent py-2.5 px-3 text-sm shadow-none focus-visible:ring-0 placeholder:text-muted-foreground/70"
+                />
+                <div className="flex items-center justify-end px-3 pt-1 pb-1">
+                  <Button
+                    size="sm"
+                    className="h-8 gap-1.5 px-4 text-xs rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    disabled={busy || !input.trim()}
+                    onClick={() => submit(input)}
+                  >
+                    <Send className="h-3 w-3" />
+                    Send
+                  </Button>
+                </div>
+              </div>
+              <p className="mt-3 text-center text-[10px] text-muted-foreground/60">
+                Generated analysis is a drafting aid and must be verified against the original record before filing.
+              </p>
             </div>
-            <p className="mt-2 text-[11px] text-muted-foreground">
-              Generated analysis is a drafting aid and must be verified against the original record
-              before filing.
-            </p>
           </div>
         </section>
       </div>
