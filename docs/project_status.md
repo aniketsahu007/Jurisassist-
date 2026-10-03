@@ -1,6 +1,6 @@
 # jurisAssist — Project Status
 
-_Last updated: 27 September 2026_
+_Last updated: 3 October 2026_
 
 ---
 
@@ -24,7 +24,7 @@ _Last updated: 27 September 2026_
 - Document upload: presigned URL two-step flow (files go directly to Supabase Storage, never touch API server)
 - Frontend hooks (`useCases`, `useDocuments`) wired to live FastAPI via TanStack Query
 
-### Phase 2.5 — Authentication Migration ✅  _(completed today)_
+### Phase 2.5 — Authentication Migration ✅
 > Previously used **Clerk** — migrated to **Supabase Auth + Google OAuth**
 
 - `src/lib/supabase.ts` — Supabase browser client singleton
@@ -35,7 +35,7 @@ _Last updated: 27 September 2026_
 - `src/components/layout/AppShell.tsx` — auth guard, redirects unauthenticated users to `/sign-up`
 - `src/components/layout/Topbar.tsx` — shows real user avatar + name from Google; sign-out dropdown
 
-### Phase 2.6 — Folder Restructure ✅  _(completed today)_
+### Phase 2.6 — Folder Restructure ✅
 Dissolved the flat `src/pages/` and `src/hooks/` directories into a **feature-slice architecture**:
 
 ```
@@ -85,26 +85,37 @@ Build: ✅ 0 errors, 2646 modules
 
 ---
 
-## Pending
-
-> Phase 7: Agent Layer (AI Assistant / Orchestration) is the next immediate task.
+### Phase 7 — Agent Layer & AI Assistant ✅  _(completed 3 October 2026)_
+- **Agent Orchestrator** (`agent_orchestrator.py`): Two-step LLM pipeline — intent routing → tool dispatch → grounded final answer. Routes to `find_similar_cases` (precedent engine) and `extract_timeline` tools.
+- **Conversation Persistence**: Full CRUD for `Conversation` + `ConversationMessage` models in PostgreSQL. Backend endpoints: `GET/POST /assistant/chat`, `GET /conversations`, `GET /conversations/{id}`, `DELETE /conversations/{id}`.
+- **Chat History in UI**: `useAssistant.ts` refactored to save/load conversations from DB. Sidebar lists all past conversations; clicking restores full message history.
+- **Chat Memory**: Last 5 messages injected into LLM context for multi-turn continuity. Duplicate message deduplication in orchestrator prevents empty responses.
+- **Profile Page**: Shows real user data from Supabase Auth (name, email, avatar) instead of static mock data.
+- **Theme Update**: Dark mode changed from violet tint to premium neutral black palette.
 
 ---
 
-## Still on mock data (expected — future phases)
+## Pending
 
-| Feature | Hook | Phase |
+> Phase 8: Final Integration, Polish & Wiring is the next immediate task.
+
+---
+
+## Still on mock data (to be addressed in Phase 8)
+
+| Feature | Hook / File | What's mock |
 |---|---|---|
-| Dashboard metrics & charts | `useDashboard.ts` | 4 |
-| Case timeline | `useTimeline.ts` | 4 |
-| AI Assistant | `useAssistant.ts` | 7 |
-| Memory bank | `useMemoryBank.ts` | 8 |
-| Pattern analysis | `usePatterns.ts` | 8 |
-| Profile, Settings, Notifications, Reports | — | future |
+| Dashboard charts | `useDashboard.ts` / `dashboard.py` | activityFeed, hearingsOverTime, caseTypeMix hardcoded |
+| AI Reports | `useReport.ts` / `reports.py` | Backend returns `None` — no report generation logic |
+| Pattern Analysis | `usePatterns.ts` / `patterns.py` | Backend returns empty arrays — no analysis logic |
+| AI Memory Bank | `useMemoryBank.ts` / `memory.py` | Backend returns empty arrays — no search logic |
+| Notifications | `useNotificationCenter.ts` | Initializes to empty `[]`, no backend integration |
+| Profile details | `useProfile.ts` | Still imports from `@/data/profile` for firm, billing, API keys |
+| Settings | `useSettings.ts` | Still imports from `@/data/settings` for integrations, security events |
+| Case Timeline | `useTimeline.ts` | Fetches from API but backend may return empty |
 
 ---
 
 ## What's Next
 
-1. Start both the Vite frontend server and FastAPI backend server.
-2. Go to the Precedents Search page in the UI and test the complete pipeline!
+1. Execute Phase 8 — see `docs/phase_8_plan.md`

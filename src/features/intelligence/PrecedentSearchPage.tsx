@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearch } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import { Bookmark, BookmarkCheck, GitCompare, Eye, Scale, Search, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { usePrecedentSearch, usePrecedentSummary, useSavedPrecedents } from "./usePrecedents";
+import { useCases } from "@/features/cases/useCases";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function relevanceTone(score: number) {
   if (score >= 85) return "text-success";
@@ -32,8 +40,7 @@ function PrecedentCard({
   const isSaved = saved.includes(p.id);
   const inCompare = compare.includes(p.id);
   const [expanded, setExpanded] = useState(false);
-  
-  const { data, isLoading } = usePrecedentSummary(p.id, search, expanded);
+  const { data, isLoading } = usePrecedentSummary(p.id, search, expanded, p.summary);
 
   return (
     <article
@@ -127,19 +134,44 @@ function PrecedentCard({
 
 export default function PrecedentSearchPage() {
   const searchParams = useSearch({ strict: false });
-  const caseId = (searchParams as any).caseId;
+  const navigate = useNavigate();
+  const initialCaseId = (searchParams as any).caseId;
+  const [selectedCaseId, setSelectedCaseId] = useState<string>(initialCaseId || "");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [compare, setCompare] = useState<string[]>([]);
+  
+  const { items: cases, loading: casesLoading } = useCases({ pageSize: 100 });
+
+  useEffect(() => {
+    if (!selectedCaseId && cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [cases, selectedCaseId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Update URL when case changes to share links
+  const handleCaseChange = (newCaseId: string) => {
+    setSelectedCaseId(newCaseId);
+    navigate({ search: { caseId: newCaseId }, replace: true });
+  };
 
   // Passing the current context to usePrecedentSearch
   const { results, total, loading } = usePrecedentSearch({
-    search,
-    caseId,
+    search: debouncedSearch,
+    caseId: selectedCaseId,
   });
-  const { saved, toggle } = useSavedPrecedents(caseId);
+  const { saved, toggle } = useSavedPrecedents(selectedCaseId);
 
   const reset = () => {
     setSearch("");
+    setDebouncedSearch("");
   };
 
   const toggleCompare = (id: string) =>
@@ -158,10 +190,32 @@ export default function PrecedentSearchPage() {
           </p>
         </div>
         
-        {/* IKanoon Powered By Logo Placeholder */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/50 rounded-md">
-          <span className="text-xs text-muted-foreground font-medium">Powered by</span>
-          <span className="text-sm font-bold tracking-tight text-primary">IndianKanoon</span>
+        {/* Case Selector and IKanoon Powered By Logo */}
+        <div className="flex flex-col items-end gap-3">
+          <div className="w-full min-w-[250px]">
+            <Select value={selectedCaseId} onValueChange={handleCaseChange}>
+              <SelectTrigger className="h-9 text-sm bg-background">
+                <SelectValue placeholder={casesLoading ? "Loading cases…" : "Choose a case"} />
+              </SelectTrigger>
+              <SelectContent>
+                {cases.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.caseNumber ? `${c.caseNumber} — ` : ""}
+                    {c.title}
+                  </SelectItem>
+                ))}
+                {cases.length === 0 && !casesLoading && (
+                  <SelectItem value="__none" disabled>
+                    No cases found
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/50 rounded-md w-fit">
+            <span className="text-xs text-muted-foreground font-medium">Powered by</span>
+            <span className="text-sm font-bold tracking-tight text-primary">IndianKanoon</span>
+          </div>
         </div>
       </div>
 

@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProfile } from "./useProfile";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
@@ -64,51 +65,62 @@ function Panel({
 
 export default function ProfilePage() {
   const { profile, firm, apiKeys, billing, prefs, togglePref } = useProfile();
+  const { user } = useAuth();
   const { theme, toggle } = useTheme();
+  
+  const displayProfile = { 
+    ...profile, 
+    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || profile.name,
+    email: user?.email || profile.email,
+    initials: (user?.user_metadata?.full_name?.[0] || user?.email?.[0] || profile.initials).toUpperCase()
+  };
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-5">
       <header className="panel flex flex-wrap items-center gap-5 p-6">
         <Avatar className="h-16 w-16">
           <AvatarFallback className="bg-primary text-lg text-primary-foreground">
-            {profile.initials}
+            {displayProfile.initials}
           </AvatarFallback>
+          {user?.user_metadata?.avatar_url && (
+            <img src={user.user_metadata.avatar_url} alt="Avatar" className="h-full w-full object-cover rounded-full" />
+          )}
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="text-eyebrow">Profile</p>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            {profile.designation} {profile.name}
+            {displayProfile.designation} {displayProfile.name}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {firm.role}, {firm.name} · Enrolled {profile.enrolmentYear} · Bar Council ID{" "}
-            <span className="font-mono">{profile.barCouncilId}</span>
+            {firm.role}, {firm.name} · Enrolled {displayProfile.enrolmentYear} · Bar Council ID{" "}
+            <span className="font-mono">{displayProfile.barCouncilId}</span>
           </p>
         </div>
-        <Button variant="outline">Edit profile</Button>
+        <Button variant="outline" onClick={() => alert("Profile editing will be available in Phase 8.")}>Edit profile</Button>
       </header>
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="min-w-0 space-y-5 lg:col-span-2">
           <Panel icon={ScrollText} title="Practitioner details" subtitle="Public chamber profile">
-            <p className="text-sm text-muted-foreground">{profile.bio}</p>
+            <p className="text-sm text-muted-foreground">{displayProfile.bio}</p>
             <Separator className="my-4" />
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
                 <dt className="text-eyebrow">Email</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm">
-                  <Mail className="h-3.5 w-3.5 text-muted-foreground" /> {profile.email}
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground" /> {displayProfile.email}
                 </dd>
               </div>
               <div>
                 <dt className="text-eyebrow">Phone</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm">
-                  <Phone className="h-3.5 w-3.5 text-muted-foreground" /> {profile.phone}
+                  <Phone className="h-3.5 w-3.5 text-muted-foreground" /> {displayProfile.phone}
                 </dd>
               </div>
               <div>
                 <dt className="text-eyebrow">Practice areas</dt>
                 <dd className="mt-1.5 flex flex-wrap gap-1.5">
-                  {profile.practiceAreas.map((a) => (
+                  {displayProfile.practiceAreas.map((a) => (
                     <Badge key={a} variant="secondary" className="text-[11px]">
                       {a}
                     </Badge>
@@ -118,7 +130,7 @@ export default function ProfilePage() {
               <div>
                 <dt className="text-eyebrow">Courts of practice</dt>
                 <dd className="mt-1.5 flex flex-wrap gap-1.5">
-                  {profile.courtsOfPractice.map((c) => (
+                  {displayProfile.courtsOfPractice.map((c) => (
                     <Badge key={c} variant="outline" className="text-[11px]">
                       {c}
                     </Badge>
@@ -127,7 +139,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <dt className="text-eyebrow">Languages</dt>
-                <dd className="mt-1 text-sm">{profile.languages.join(", ")}</dd>
+                <dd className="mt-1 text-sm">{displayProfile.languages.join(", ")}</dd>
               </div>
             </dl>
           </Panel>

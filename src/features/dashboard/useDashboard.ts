@@ -1,35 +1,33 @@
-import { useEffect, useState } from "react";
-import {
-  activityFeed,
-  notifications,
-  dashboardMetrics,
-  casesByStatus,
-  hearingsOverTime,
-  caseTypeMix,
-} from "@/data/dashboard";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "@/lib/api";
 
-/** Future integration point: replace with FastAPI-backed queries. */
 export function useDashboard() {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(t);
-  }, []);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => dashboardApi.get(),
+  });
 
   return {
     loading,
-    metrics: dashboardMetrics,
-    activity: activityFeed,
-    notifications,
-    casesByStatus,
-    hearingsOverTime,
-    caseTypeMix,
+    metrics: data?.metrics || [],
+    activity: data?.activityFeed || [],
+    notifications: data?.notifications || [],
+    casesByStatus: data?.casesByStatus || [],
+    hearingsOverTime: data?.hearingsOverTime || [],
+    caseTypeMix: data?.caseTypeMix || [],
   };
 }
 
 export function useNotifications() {
+  const { data } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => dashboardApi.get(),
+  });
+  
+  const notifications = data?.notifications || [];
+  
   return {
     items: notifications,
-    unread: notifications.filter((n) => !n.read).length,
+    unread: notifications.filter((n: any) => !n.read).length,
   };
 }

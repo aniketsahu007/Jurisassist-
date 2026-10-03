@@ -7,7 +7,7 @@ import {
 
 /** Future integration point: replace with FastAPI-backed notification queries. */
 export function useNotificationCenter() {
-  const [items, setItems] = useState<CenterNotification[]>(notificationCenter);
+  const [items, setItems] = useState<CenterNotification[]>([]);
   const [type, setType] = useState<NotificationType | "all">("all");
   const [unreadOnly, setUnreadOnly] = useState(false);
 

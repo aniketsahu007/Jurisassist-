@@ -150,6 +150,7 @@ class PrecedentSearchResponse(BaseSchema):
 class PrecedentSummaryRequest(BaseSchema):
     docid: str
     query: str
+    fragment: Optional[str] = None
     
 class PrecedentSummaryResponse(BaseSchema):
     ai_summary: str

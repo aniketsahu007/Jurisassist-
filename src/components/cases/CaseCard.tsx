@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { CalendarClock, Gavel, FileText, Clock, Building2, User2, Hash } from "lucide-react";
 import type { ApiCase } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -124,8 +125,9 @@ export function CaseCard({ item, index = 0 }: { item: ApiCase; index?: number })
           variant="ghost"
           size="sm"
           className="text-xs opacity-70 transition-opacity group-hover:opacity-100"
+          asChild
         >
-          Open
+          <Link to="/precedents" search={{ caseId: item.id }}>Open</Link>
         </Button>
       </div>
     </article>

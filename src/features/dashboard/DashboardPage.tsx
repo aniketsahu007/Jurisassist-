@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { CalendarPlus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "./useDashboard";
@@ -20,11 +21,15 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <CalendarPlus className="mr-2 h-4 w-4" /> Add hearing
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/timeline">
+              <CalendarPlus className="mr-2 h-4 w-4" /> View timeline
+            </Link>
           </Button>
-          <Button size="sm">
-            <Sparkles className="mr-2 h-4 w-4" /> Generate AI report
+          <Button size="sm" asChild>
+            <Link to="/reports">
+              <Sparkles className="mr-2 h-4 w-4" /> Generate AI report
+            </Link>
           </Button>
         </div>
       </div>

@@ -1,30 +1,20 @@
-import { useEffect, useState } from "react";
-import {
-  heatmapArguments,
-  judgeArgumentHeatmap,
-  judgePreferences,
-  rejectedArguments,
-  sectionOutcomes,
-  strategyOutcomes,
-  successTrend,
-} from "@/data/patterns";
+import { useQuery } from "@tanstack/react-query";
+import { patternsApi } from "@/lib/api";
 
-/** Future integration point: replace with FastAPI-backed analytics queries. */
 export function usePatterns() {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 560);
-    return () => clearTimeout(t);
-  }, []);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["patterns"],
+    queryFn: () => patternsApi.get(),
+  });
 
   return {
     loading,
-    judgePreferences,
-    successTrend,
-    rejectedArguments,
-    sectionOutcomes,
-    strategyOutcomes,
-    heatmapArguments,
-    judgeArgumentHeatmap,
+    judgePreferences: data?.judgePreferences || [],
+    successTrend: data?.successTrend || [],
+    rejectedArguments: data?.rejectedArguments || [],
+    sectionOutcomes: data?.sectionOutcomes || [],
+    strategyOutcomes: data?.strategyOutcomes || data?.successfulStrategies || [],
+    heatmapArguments: data?.heatmapArguments || [],
+    judgeArgumentHeatmap: data?.judgeArgumentHeatmap || [],
   };
 }

@@ -49,19 +49,16 @@ def _highlight_keywords(text: str, query: str) -> str:
 
 def _grounding_check(summary: str, fragment: str) -> bool:
     """Returns True if grounded, False if hallucinates."""
-    # Check for Sections
-    sections = re.findall(r'(?i)(?:Section|Sec\.?)\s*\d+[a-zA-Z]*', summary)
-    for s in sections:
-        num_match = re.search(r'\d+', s)
-        if num_match:
-            num = num_match.group()
-            if num not in fragment:
-                return False
-            
-    # Very strict check for years or years in citations (e.g. 2021)
-    years = re.findall(r'\b(19\d{2}|20\d{2})\b', summary)
-    for y in years:
-        if y not in fragment:
+    # Any digit sequence in the summary MUST be present in the fragment.
+    # This strictly prevents hallucinated section numbers, years, and dates.
+    summary_numbers = set(re.findall(r'\b\d+\b', summary))
+    fragment_numbers = set(re.findall(r'\b\d+\b', fragment))
+    if not summary_numbers.issubset(fragment_numbers):
+        return False
+        
+    # Check for hallucinated case names (indicated by v. or vs.)
+    if re.search(r'\b(?:v\.|vs\.?)\b', summary, re.IGNORECASE):
+        if not re.search(r'\b(?:v\.|vs\.?)\b', fragment, re.IGNORECASE):
             return False
             
     return True
@@ -157,3 +154,30 @@ async def generate_summary(docid: str, query: str, fragment: str) -> Dict[str, A
         "prompt_version": PROMPT_VERSION,
         "cache_hit": False
     }
+
+async def generate_chat_response(query: str) -> str:
+    providers = _get_providers()
+    if not providers:
+        return "I'm sorry, no AI providers are currently configured."
+    
+    for provider in providers:
+        if breaker.is_open(provider["id"]):
+            continue
+            
+        try:
+            client = AsyncOpenAI(base_url=provider["base_url"], api_key=provider["api_key"])
+            response = await asyncio.wait_for(client.chat.completions.create(
+                model=provider["model"],
+                messages=[
+                    {"role": "system", "content": "You are a helpful legal AI assistant for jurisAssist. You help lawyers analyze case laws and prepare for hearings. Be concise and professional."},
+                    {"role": "user", "content": query}
+                ],
+                temperature=0.7,
+                max_tokens=500,
+            ), timeout=10.0)
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"Chat failed with provider {provider['name']}: {e}")
+            breaker.record_failure(provider["id"])
+            
+    return "I'm currently unable to process your request. Please try again later."

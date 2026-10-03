@@ -28,10 +28,10 @@ export function usePrecedentSearch(queryObj: PrecedentQuery = {}) {
   return { results, total: results.length, loading };
 }
 
-export function usePrecedentSummary(docid: string, query: string, enabled: boolean) {
+export function usePrecedentSummary(docid: string, query: string, enabled: boolean, fragment?: string) {
   return useQuery({
     queryKey: ["precedent-summary", docid, query],
-    queryFn: () => precedentsApi.generateSummary(docid, query),
+    queryFn: () => precedentsApi.generateSummary(docid, query, fragment),
     enabled: enabled && !!docid && !!query.trim(),
     staleTime: Infinity,
   });

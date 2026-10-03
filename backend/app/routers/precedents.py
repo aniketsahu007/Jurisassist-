@@ -49,18 +49,21 @@ async def generate_precedent_summary(
     req: PrecedentSummaryRequest,
     current_user_id: str = Depends(get_current_user),
 ):
-    # 1. Fetch docfragment from IK on the server side
-    try:
-        data = IndianKanoonClient.search(f"id:{req.docid} {req.query}", doctypes="")
-        docs = data.get("docs", [])
-        if not docs:
-            # Fallback
-            doc_data = IndianKanoonClient.get_doc(req.docid)
-            fragment = doc_data.get("headline", doc_data.get("title", "")) 
-        else:
-            fragment = docs[0].get("headline", "")
-    except Exception as e:
-        fragment = "No excerpt available."
+    # 1. Use provided fragment or fetch from IK
+    if req.fragment:
+        fragment = req.fragment
+    else:
+        try:
+            data = IndianKanoonClient.search(f"{req.query}", doctypes="")
+            docs = data.get("docs", [])
+            # Try to find the specific docid in search results
+            target_doc = next((d for d in docs if str(d.get("tid")) == str(req.docid)), None)
+            if target_doc:
+                fragment = target_doc.get("headline", "")
+            else:
+                fragment = "No excerpt available."
+        except Exception as e:
+            fragment = "No excerpt available."
         
     # 2. Strip PII
     safe_query = pii_stripper.strip_pii(req.query)

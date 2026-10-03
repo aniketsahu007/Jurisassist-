@@ -268,3 +268,40 @@ class CorrectionLog(Base):
         Index("ix_corr_logs_extracted_entity_id", "extracted_entity_id"),
         Index("ix_corr_logs_timeline_event_id", "timeline_event_id"),
     )
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String, nullable=False, default="New Conversation")
+    case_id = Column(String, ForeignKey("cases.id", ondelete="SET NULL"), nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    messages = relationship("ConversationMessage", back_populates="conversation", order_by="ConversationMessage.created_at")
+
+    __table_args__ = (
+        Index("ix_conversations_user_id", "user_id"),
+    )
+
+
+class ConversationMessage(Base):
+    __tablename__ = "conversation_messages"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    conversation_id = Column(String, ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String, nullable=False)  # "user" or "assistant"
+    content = Column(Text, nullable=False)
+    citations = Column(JSON, nullable=True, default=list)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    conversation = relationship("Conversation", back_populates="messages")
+
+    __table_args__ = (
+        Index("ix_conv_messages_conversation_id", "conversation_id"),
+    )
+

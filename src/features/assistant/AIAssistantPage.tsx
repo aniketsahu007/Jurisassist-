@@ -19,8 +19,12 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAssistant } from "./useAssistant";
-import { quickActions, suggestedPrompts, type QuickActionId } from "@/data/assistant";
 import { MarkdownText } from "@/components/assistant/MarkdownText";
+
+export type QuickActionId = "summarize" | "contradictions" | "draft" | "similar" | "timeline";
+
+const quickActions: { id: QuickActionId; label: string; prompt: string }[] = [];
+const suggestedPrompts: string[] = [];
 
 const actionIcon: Record<QuickActionId, typeof ListChecks> = {
   summarize: ListChecks,

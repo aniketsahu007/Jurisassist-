@@ -193,9 +193,32 @@ export const precedentsApi = {
       method: "POST",
       body: JSON.stringify({ query, top_k: topK, case_id: caseId }),
     }),
-  generateSummary: (docid: string, query: string) =>
+  generateSummary: (docid: string, query: string, fragment?: string) =>
     request<PrecedentSummaryResponse>("/api/v1/precedents/generate-summary", {
       method: "POST",
-      body: JSON.stringify({ docid, query }),
+      body: JSON.stringify({ docid, query, fragment }),
     }),
+};
+
+export const dashboardApi = {
+  get: () => request<any>("/api/v1/dashboard"),
+};
+
+export const assistantApi = {
+  chat: (payload: any) => request<any>("/api/v1/assistant/chat", { method: "POST", body: JSON.stringify(payload) }),
+  getConversations: () => request<any[]>("/api/v1/assistant/conversations"),
+  getConversation: (id: string) => request<any>(`/api/v1/assistant/conversations/${id}`),
+  deleteConversation: (id: string) => request<void>(`/api/v1/assistant/conversations/${id}`, { method: "DELETE" }),
+};
+
+export const memoryApi = {
+  search: (query: string) => request<any>(`/api/v1/memory?query=${encodeURIComponent(query)}`),
+};
+
+export const patternsApi = {
+  get: () => request<any>("/api/v1/patterns"),
+};
+
+export const reportsApi = {
+  getCaseReport: (caseId: string) => request<any>(`/api/v1/reports/${caseId}`),
 };

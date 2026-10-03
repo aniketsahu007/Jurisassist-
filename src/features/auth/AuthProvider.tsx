@@ -29,6 +29,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (import.meta.env.VITE_DEV_BYPASS_AUTH === "1") {
+      setSession({
+        access_token: "dummy",
+        refresh_token: "dummy",
+        user: { id: "00000000-0000-0000-0000-000000000000", email: "dev@test.com" }
+      } as unknown as Session);
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);

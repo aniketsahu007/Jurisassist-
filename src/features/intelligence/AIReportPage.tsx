@@ -1,3 +1,5 @@
+import { useSearch, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import {
   FileBarChart,
   Download,
@@ -18,6 +20,14 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useCaseReport } from "./useReport";
+import { useCases } from "@/features/cases/useCases";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function ConfidenceRing({ value }: { value: number }) {
   const r = 52;
@@ -103,7 +113,25 @@ function fmtDate(iso: string) {
 }
 
 export default function AIReportPage() {
-  const { report, loading } = useCaseReport();
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+  const initialCaseId = (searchParams as any).caseId;
+  const [selectedCaseId, setSelectedCaseId] = useState<string>(initialCaseId || "");
+  
+  const { items: cases, loading: casesLoading } = useCases({ pageSize: 100 });
+
+  useEffect(() => {
+    if (!selectedCaseId && cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [cases, selectedCaseId]);
+
+  const handleCaseChange = (newCaseId: string) => {
+    setSelectedCaseId(newCaseId);
+    navigate({ search: { caseId: newCaseId }, replace: true });
+  };
+
+  const { report, loading } = useCaseReport(selectedCaseId);
 
   if (loading) {
     return (
@@ -151,11 +179,33 @@ export default function AIReportPage() {
               </Button>
             </div>
           </div>
-          <div className="flex shrink-0 flex-col items-center">
-            <ConfidenceRing value={report.confidence} />
-            <p className="mt-2 max-w-[180px] text-center text-[11px] text-muted-foreground">
-              High confidence on admissibility findings; moderate on quantum.
-            </p>
+          <div className="flex shrink-0 flex-col items-center gap-4">
+            <div className="w-full sm:w-[250px]">
+              <Select value={selectedCaseId} onValueChange={handleCaseChange}>
+                <SelectTrigger className="h-9 text-sm bg-background">
+                  <SelectValue placeholder={casesLoading ? "Loading cases…" : "Choose a case"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {cases.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.caseNumber ? `${c.caseNumber} — ` : ""}
+                      {c.title}
+                    </SelectItem>
+                  ))}
+                  {cases.length === 0 && !casesLoading && (
+                    <SelectItem value="__none" disabled>
+                      No cases found
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col items-center">
+              <ConfidenceRing value={report.confidence} />
+              <p className="mt-2 max-w-[180px] text-center text-[11px] text-muted-foreground">
+                High confidence on admissibility findings; moderate on quantum.
+              </p>
+            </div>
           </div>
         </div>
       </header>

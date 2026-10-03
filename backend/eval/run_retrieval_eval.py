@@ -55,9 +55,10 @@ def dedupe(variant_results: List[List[Dict]]) -> List[Dict]:
     merged = []
     seen = set()
     for lst in variant_results:
-        for doc in lst:
+        for idx, doc in enumerate(lst):
             if doc["docid"] not in seen:
                 seen.add(doc["docid"])
+                doc["ik_rank"] = idx
                 merged.append(doc)
     return merged
 
@@ -70,14 +71,20 @@ def rerank_minilm(query: str, candidates: List[Dict]) -> List[Dict]:
     embedder = DefaultEmbeddingFunction()
     query_emb = np.array(embedder([query])[0])
     
-    # We embed the combination of Title + Snippet/Headline from IK
     texts = [f"{c['title']} {c['headline']}" for c in candidates]
     doc_embs = np.array(embedder(texts))
     
     for idx, c in enumerate(candidates):
-        c["vector_sim"] = cosine_similarity(query_emb, doc_embs[idx])
+        vec_sim = cosine_similarity(query_emb, doc_embs[idx])
+        c["vector_sim"] = float(vec_sim)
         
-    reranked = sorted(candidates, key=lambda x: x["vector_sim"], reverse=True)
+        # Calculate hybrid score. Assume candidate list was appended in order.
+        # c['ik_rank'] is injected during dedupe
+        rank = c.get('ik_rank', idx)
+        rank_score = max(0.0, 1.0 - (rank / 15.0))
+        c["hybrid_score"] = float(vec_sim * 0.4 + rank_score * 0.6)
+        
+    reranked = sorted(candidates, key=lambda x: x["hybrid_score"], reverse=True)
     return reranked
 
 def run_eval():

@@ -29,9 +29,10 @@ def dedupe(variant_results: List[List[Dict]]) -> List[Dict]:
     merged = []
     seen = set()
     for lst in variant_results:
-        for doc in lst:
+        for idx, doc in enumerate(lst):
             if doc["docid"] not in seen:
                 seen.add(doc["docid"])
+                doc["ik_rank"] = idx
                 merged.append(doc)
     return merged
 
@@ -109,7 +110,11 @@ async def fetch_and_rerank(query: str, top_k: int = 10) -> List[Dict[str, Any]]:
     doc_embs = np.array(embeddings[1:])
     
     for idx, c in enumerate(merged_candidates):
-        c["vector_sim"] = cosine_similarity(query_emb, doc_embs[idx])
+        vec_sim = cosine_similarity(query_emb, doc_embs[idx])
+        c["vector_sim"] = float(vec_sim)
+        rank = c.get('ik_rank', idx)
+        rank_score = max(0.0, 1.0 - (rank / 15.0))
+        c["hybrid_score"] = float(vec_sim * 0.4 + rank_score * 0.6)
         
-    reranked = sorted(merged_candidates, key=lambda x: x["vector_sim"], reverse=True)
+    reranked = sorted(merged_candidates, key=lambda x: x.get("hybrid_score", 0), reverse=True)
     return reranked[:top_k]
