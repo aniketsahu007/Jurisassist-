@@ -2,13 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { CalendarPlus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "./useDashboard";
+import { useNotificationCenter } from "@/features/notifications/useNotificationCenter";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { CasesByStatusChart, HearingsChart } from "@/components/dashboard/Charts";
 import { ActivityPanel, NotificationsPanel } from "@/components/dashboard/ActivityPanel";
 
 export default function DashboardPage() {
-  const { loading, metrics, activity, notifications, casesByStatus, hearingsOverTime } =
+  const { loading, metrics, activity, casesByStatus, hearingsOverTime } =
     useDashboard();
+  const { items: notifications } = useNotificationCenter();
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">

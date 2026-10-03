@@ -213,6 +213,7 @@ export const assistantApi = {
 
 export const memoryApi = {
   search: (query: string) => request<any>(`/api/v1/memory?query=${encodeURIComponent(query)}`),
+  saveNote: (content: string) => request<any>("/api/v1/memory/notes", { method: "POST", body: JSON.stringify({ content }) }),
 };
 
 export const patternsApi = {
@@ -221,4 +222,17 @@ export const patternsApi = {
 
 export const reportsApi = {
   getCaseReport: (caseId: string) => request<any>(`/api/v1/reports/${caseId}`),
+  generateCaseReport: (caseId: string) => request<any>(`/api/v1/reports/${caseId}/generate`, { method: "POST" }),
+};
+
+export const profileApi = {
+  get: () => request<any>("/api/v1/profile"),
+  update: (data: any) => request<any>("/api/v1/profile", { method: "PUT", body: JSON.stringify(data) }),
+};
+
+export const notificationsApi = {
+  get: () => request<any[]>("/api/v1/notifications"),
+  markRead: (id: string) => request<any>(`/api/v1/notifications/${id}/read`, { method: "PATCH" }),
+  delete: (id: string) => request<any>(`/api/v1/notifications/${id}`, { method: "DELETE" }),
+  clearAll: () => request<any>("/api/v1/notifications", { method: "DELETE" }),
 };

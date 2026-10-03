@@ -212,14 +212,14 @@ Various buttons across the app trigger `alert()` or do nothing.
 ## Execution Order (Dependency-Aware)
 
 ### Recommended order:
-1. **8.6** (Profile/Settings) — smallest scope, highest user visibility
-2. **8.5** (Notifications) — enables event emission for later phases
-3. **8.1** (Dashboard) — quick wins with real DB queries
-4. **8.2** (Reports) — largest scope, most complex LLM integration
-5. **8.3** (Patterns) — depends on having precedent data
-6. **8.4** (Memory) — depends on ChromaDB being populated
-7. **8.7** (Button audit) — sweep after all APIs exist
-8. **8.8** (Cleanup) — final pass, build verification
+1. **8.6** (Profile/Settings) — smallest scope, highest user visibility ✅ Done
+2. **8.5** (Notifications) — enables event emission for later phases ✅ Done
+3. **8.1** (Dashboard) — quick wins with real DB queries ✅ Done
+4. **8.2** (Reports) — largest scope, most complex LLM integration ✅ Done
+5. **8.3** (Patterns) — depends on having precedent data ✅ Done
+6. **8.4** (Memory) — depends on ChromaDB being populated ✅ Done
+7. **8.7** (Button audit) — sweep after all APIs exist ✅ Done
+8. **8.8** (Cleanup) — final pass, build verification ✅ Done
 
 ---
 
@@ -227,10 +227,10 @@ Various buttons across the app trigger `alert()` or do nothing.
 
 - [ ] `npm run build` produces 0 errors
 - [ ] `src/data/` directory contains only TypeScript type definitions (no mock data)
-- [ ] Every sidebar nav link leads to a functional page
-- [ ] Every button performs a real action (or is removed)
-- [ ] Dashboard shows live metrics from the database
-- [ ] AI Reports can be generated and downloaded
-- [ ] Notifications appear when events occur
-- [ ] Profile can be viewed and edited
+- [x] Every sidebar nav link leads to a functional page
+- [x] Every button performs a real action (or is removed)
+- [x] Dashboard shows live metrics from the database
+- [x] AI Reports can be generated and downloaded
+- [x] Notifications appear when events occur
+- [x] Profile can be viewed and edited
 - [ ] No `alert("Phase 8")` calls remain in the codebase

@@ -13,8 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useNotificationCenter } from "./useNotificationCenter";
-import type { NotificationType } from "@/data/notifications";
+import { useNotificationCenter, type NotificationType } from "./useNotificationCenter";
 
 const typeMeta: Record<NotificationType, { icon: typeof Bell; tone: string; dot: string }> = {
   "Upcoming Hearing": {
@@ -120,14 +119,18 @@ export default function NotificationsPage() {
 
       <ul className="space-y-3">
         {items.map((n) => {
-          const meta = typeMeta[n.type];
+          const meta = typeMeta[n.type as keyof typeof typeMeta] || {
+            icon: Bell,
+            tone: "bg-muted/10 text-muted-foreground border-muted/20",
+            dot: "bg-muted",
+          };
           const Icon = meta.icon;
           return (
             <li
               key={n.id}
               className={cn(
                 "panel flex gap-4 p-4 transition-colors",
-                !n.read && "border-primary/30 bg-primary/[0.03]",
+                !n.is_read && "border-primary/30 bg-primary/[0.03]",
               )}
             >
               <div
@@ -141,29 +144,22 @@ export default function NotificationsPage() {
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  {!n.read && <span className={cn("h-2 w-2 rounded-full", meta.dot)} />}
+                  {!n.is_read && <span className={cn("h-2 w-2 rounded-full", meta.dot)} />}
                   <p className="text-sm font-semibold">{n.title}</p>
                   <Badge variant="outline" className={cn("text-[10px]", meta.tone)}>
                     {n.type}
                   </Badge>
-                  {n.priority === "high" && (
-                    <Badge
-                      variant="outline"
-                      className="border-destructive/20 bg-destructive/10 text-[10px] text-destructive"
-                    >
-                      High priority
-                    </Badge>
-                  )}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{n.detail}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{n.message}</p>
                 <p className="mt-2 font-mono text-[11px] text-muted-foreground">
-                  {n.caseNumber} · {n.caseName} · {timeAgo(n.timestamp)}
+                  {n.link ? <a href={n.link} className="hover:underline text-primary mr-2">View Reference</a> : null}
+                  {timeAgo(n.created_at)}
                 </p>
               </div>
 
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Button variant="ghost" size="sm" onClick={() => toggleRead(n.id)}>
-                  {n.read ? "Mark unread" : "Mark read"}
+                  {n.is_read ? "Mark unread" : "Mark read"}
                 </Button>
                 <Button
                   variant="ghost"

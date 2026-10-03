@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-from .routers import cases, documents, search, precedents, dashboard, assistant, memory, patterns, reports
+from .routers import cases, documents, search, precedents, dashboard, assistant, memory, patterns, reports, profile, notifications
 
 # Load env variables
 load_dotenv()
@@ -48,3 +48,5 @@ app.include_router(assistant.router)
 app.include_router(memory.router)
 app.include_router(patterns.router)
 app.include_router(reports.router)
+app.include_router(profile.router)
+app.include_router(notifications.router)

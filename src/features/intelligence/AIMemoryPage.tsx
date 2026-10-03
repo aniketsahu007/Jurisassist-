@@ -50,10 +50,15 @@ const outcomeTone: Record<string, string> = {
   Ongoing: "bg-warning/10 text-warning border-warning/20",
 };
 
+import { useSearch } from "@tanstack/react-router";
+
 export default function AIMemoryPage() {
+  const searchParams = useSearch({ strict: false });
+  const initialQuery = (searchParams as any).q || "";
+  
   const { loading, pastCases, strategies, successfulArguments, frequentSections, savedNotes } =
     useMemoryBank();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const { hits, searching } = useVectorSearch(query);
 
   if (loading) {

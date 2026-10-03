@@ -23,8 +23,18 @@ import { MarkdownText } from "@/components/assistant/MarkdownText";
 
 export type QuickActionId = "summarize" | "contradictions" | "draft" | "similar" | "timeline";
 
-const quickActions: { id: QuickActionId; label: string; prompt: string }[] = [];
-const suggestedPrompts: string[] = [];
+const quickActions: { id: QuickActionId; label: string; prompt: string }[] = [
+  { id: "summarize", label: "Summarize", prompt: "Summarize the current case documents." },
+  { id: "contradictions", label: "Contradictions", prompt: "Find contradictions in the testimonies." },
+  { id: "draft", label: "Draft Reply", prompt: "Draft a reply to the recent petition." },
+  { id: "similar", label: "Similar Cases", prompt: "Find precedents similar to this case." },
+  { id: "timeline", label: "Build Timeline", prompt: "Create a chronological timeline of events." },
+];
+const suggestedPrompts: string[] = [
+  "What is the limitation period for filing the appeal?",
+  "List the key arguments made by the opposing counsel.",
+  "What evidence supports the plaintiff's claim?",
+];
 
 const actionIcon: Record<QuickActionId, typeof ListChecks> = {
   summarize: ListChecks,

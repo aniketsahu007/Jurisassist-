@@ -18,16 +18,4 @@ export function useDashboard() {
   };
 }
 
-export function useNotifications() {
-  const { data } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => dashboardApi.get(),
-  });
-  
-  const notifications = data?.notifications || [];
-  
-  return {
-    items: notifications,
-    unread: notifications.filter((n: any) => !n.read).length,
-  };
-}
+

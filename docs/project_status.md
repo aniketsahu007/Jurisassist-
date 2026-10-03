@@ -105,13 +105,6 @@ Build: ✅ 0 errors, 2646 modules
 
 | Feature | Hook / File | What's mock |
 |---|---|---|
-| Dashboard charts | `useDashboard.ts` / `dashboard.py` | activityFeed, hearingsOverTime, caseTypeMix hardcoded |
-| AI Reports | `useReport.ts` / `reports.py` | Backend returns `None` — no report generation logic |
-| Pattern Analysis | `usePatterns.ts` / `patterns.py` | Backend returns empty arrays — no analysis logic |
-| AI Memory Bank | `useMemoryBank.ts` / `memory.py` | Backend returns empty arrays — no search logic |
-| Notifications | `useNotificationCenter.ts` | Initializes to empty `[]`, no backend integration |
-| Profile details | `useProfile.ts` | Still imports from `@/data/profile` for firm, billing, API keys |
-| Settings | `useSettings.ts` | Still imports from `@/data/settings` for integrations, security events |
 | Case Timeline | `useTimeline.ts` | Fetches from API but backend may return empty |
 
 ---

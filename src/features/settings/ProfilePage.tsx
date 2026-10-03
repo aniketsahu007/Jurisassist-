@@ -26,10 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useState } from "react";
 import { useProfile } from "./useProfile";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
+import { EditProfileModal } from "./EditProfileModal";
 
 function Panel({
   icon: Icon,
@@ -64,15 +66,19 @@ function Panel({
 }
 
 export default function ProfilePage() {
-  const { profile, firm, apiKeys, billing, prefs, togglePref } = useProfile();
+  const { profile, firm, prefs, togglePref } = useProfile();
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const displayProfile = { 
     ...profile, 
-    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || profile.name,
-    email: user?.email || profile.email,
-    initials: (user?.user_metadata?.full_name?.[0] || user?.email?.[0] || profile.initials).toUpperCase()
+    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || profile.name || "",
+    email: user?.email || profile.email || "",
+    initials: (user?.user_metadata?.full_name?.[0] || user?.email?.[0] || profile.initials || "U").toUpperCase(),
+    practiceAreas: profile.practiceAreas || [],
+    courtsOfPractice: [], // Can be added later if needed
+    languages: ["English"], // Can be added later if needed
   };
 
   return (
@@ -96,7 +102,7 @@ export default function ProfilePage() {
             <span className="font-mono">{displayProfile.barCouncilId}</span>
           </p>
         </div>
-        <Button variant="outline" onClick={() => alert("Profile editing will be available in Phase 8.")}>Edit profile</Button>
+        <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>Edit profile</Button>
       </header>
 
       <div className="grid gap-5 lg:grid-cols-3">
@@ -177,52 +183,14 @@ export default function ProfilePage() {
           <Panel
             icon={KeyRound}
             title="API keys"
-            subtitle="Placeholder UI — key management is not wired to a backend"
-            action={
-              <Button variant="outline" size="sm" disabled>
-                <Plus className="mr-2 h-4 w-4" /> New key
-              </Button>
-            }
+            subtitle="Developer access"
           >
-            <div className="w-full overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead className="hidden md:table-cell">Scope</TableHead>
-                    <TableHead className="hidden sm:table-cell">Last used</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {apiKeys.map((k) => (
-                    <TableRow key={k.id}>
-                      <TableCell className="font-medium">{k.label}</TableCell>
-                      <TableCell className="font-mono text-xs">{k.maskedKey}</TableCell>
-                      <TableCell className="hidden font-mono text-xs text-muted-foreground md:table-cell">
-                        {k.scope}
-                      </TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
-                        {k.lastUsed}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-[10px]",
-                            k.status === "active"
-                              ? "border-success/20 bg-success/10 text-success"
-                              : "text-muted-foreground",
-                          )}
-                        >
-                          {k.status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed rounded-lg">
+              <KeyRound className="w-8 h-8 mb-2 text-muted-foreground opacity-50" />
+              <p className="text-sm font-medium">API access coming soon</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                You will be able to generate API keys here to connect JurisAssist with your firm's internal tools.
+              </p>
             </div>
           </Panel>
         </div>
@@ -265,63 +233,23 @@ export default function ProfilePage() {
           <Panel
             icon={CreditCard}
             title="Billing"
-            subtitle="Placeholder UI — no payment processing"
+            subtitle="Current plan"
           >
-            <div className="rounded-lg bg-surface-2 p-3">
+            <div className="rounded-lg border bg-surface-2 p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold">{billing.plan}</p>
-                <Badge variant="secondary">{billing.amount}</Badge>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Renews {billing.renewal} · {billing.paymentMethod}
-              </p>
-              <div className="mt-3">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Seats used</span>
-                  <span>
-                    {billing.seatsUsed} / {billing.seats}
-                  </span>
+                <div>
+                  <p className="text-sm font-semibold">Early Access (Free Plan)</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    You are currently using JurisAssist on an early access free plan.
+                  </p>
                 </div>
-                <Progress
-                  className="mt-1.5 h-1.5"
-                  value={(billing.seatsUsed / billing.seats) * 100}
-                />
+                <Badge variant="secondary">Free</Badge>
               </div>
             </div>
-
-            <ul className="mt-4 space-y-2">
-              {billing.invoices.map((inv) => (
-                <li
-                  key={inv.id}
-                  className="flex items-center justify-between rounded-md border px-3 py-2 text-xs"
-                >
-                  <div>
-                    <p className="font-mono">{inv.id}</p>
-                    <p className="text-muted-foreground">{inv.period}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{inv.amount}</span>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-[10px]",
-                        inv.status === "Paid"
-                          ? "border-success/20 bg-success/10 text-success"
-                          : "border-warning/20 bg-warning/10 text-warning",
-                      )}
-                    >
-                      {inv.status}
-                    </Badge>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <Button variant="outline" className="mt-4 w-full" disabled>
-              Manage billing
-            </Button>
           </Panel>
         </div>
       </div>
+      <EditProfileModal open={isEditModalOpen} onOpenChange={setIsEditModalOpen} />
     </div>
   );
 }

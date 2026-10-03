@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "@/lib/theme";
-import { useNotifications } from "@/features/dashboard/useDashboard";
+import { useNotificationCenter } from "@/features/notifications/useNotificationCenter";
 import { cn } from "@/lib/utils";
 
 export function Topbar() {
   const { theme, toggle } = useTheme();
-  const { items, unread } = useNotifications();
+  const { items, unread } = useNotificationCenter();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -43,6 +43,11 @@ export function Topbar() {
           placeholder="Search cases, statutes, judges…"
           className="h-9 bg-surface-2 pl-9 text-sm"
           aria-label="Global search"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigate({ to: "/memory", search: { q: e.currentTarget.value } });
+            }
+          }}
         />
       </div>
 
@@ -74,19 +79,27 @@ export function Topbar() {
                     <span
                       className={cn(
                         "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                        n.level === "urgent" && "bg-destructive",
-                        n.level === "info" && "bg-chart-3",
-                        n.level === "success" && "bg-success",
+                        !n.is_read ? "bg-primary" : "bg-muted"
                       )}
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-medium">{n.title}</p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">{n.detail}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{n.message}</p>
                     </div>
                   </div>
                 </li>
               ))}
+              {items.length === 0 && (
+                <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No notifications.
+                </li>
+              )}
             </ul>
+            <div className="border-t p-2">
+              <Button variant="ghost" size="sm" className="w-full justify-center" asChild>
+                <Link to="/notifications">View all</Link>
+              </Button>
+            </div>
           </PopoverContent>
         </Popover>
 

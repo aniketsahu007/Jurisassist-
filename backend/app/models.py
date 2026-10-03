@@ -305,3 +305,54 @@ class ConversationMessage(Base):
         Index("ix_conv_messages_conversation_id", "conversation_id"),
     )
 
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    user_id = Column(String(255), primary_key=True, index=True)
+    designation = Column(String(255), default="Advocate")
+    bar_council_id = Column(String(255), default="")
+    phone = Column(String(255), default="")
+    bio = Column(Text, default="")
+    practice_areas = Column(JSON, default=list) # List of strings
+    firm_name = Column(String(255), default="")
+    firm_role = Column(String(255), default="")
+    enrolment_year = Column(String(255), default="")
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(String(255), primary_key=True, default=generate_uuid)
+    user_id = Column(String(255), index=True, nullable=False)
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String(50), nullable=False) # e.g. "document_processed", "report_ready", "alert"
+    link = Column(String(255), nullable=True)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        Index("ix_notifications_user_id_created_at", "user_id", "created_at"),
+    )
+
+class CaseReport(Base):
+    __tablename__ = "case_reports"
+
+    id = Column(String(255), primary_key=True, default=generate_uuid)
+    case_id = Column(String(255), ForeignKey("cases.id", ondelete="CASCADE"), index=True, nullable=False)
+    user_id = Column(String(255), index=True, nullable=False)
+    status = Column(String(50), default="GENERATING", nullable=False) # e.g., GENERATING, COMPLETED, FAILED
+    report_json = Column(JSON, nullable=True)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    case = relationship("Case")
+
+class UserNote(Base):
+    __tablename__ = "user_notes"
+
+    id = Column(String(255), primary_key=True, default=generate_uuid)
+    user_id = Column(String(255), index=True, nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

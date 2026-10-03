@@ -1,19 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { memoryApi } from "@/lib/api";
 
 export function useMemoryBank() {
-  const { isLoading: loading } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data, isLoading: loading } = useQuery({
     queryKey: ["memory-stats"],
-    queryFn: () => memoryApi.search(""), // Basic ping
+    queryFn: () => memoryApi.search(""), // Basic ping to get stats
+  });
+
+  const saveNote = useMutation({
+    mutationFn: (content: string) => memoryApi.saveNote(content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["memory-stats"] });
+    },
   });
 
   return {
     loading,
-    pastCases: [],
-    strategies: [],
+    pastCases: data?.pastCases || [],
+    strategies: data?.strategies || [],
     successfulArguments: [],
-    frequentSections: [],
+    frequentSections: data?.frequentSections || [],
     savedNotes: [],
+    saveNote: saveNote.mutate,
+    isSavingNote: saveNote.isPending,
   };
 }
 
